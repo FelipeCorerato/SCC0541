@@ -1,0 +1,126 @@
+/* Resumo page styles */
+.resumo-content {
+  flex: 1;
+  padding: 30px 40px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+.resumo-content h1 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Chart */
+.chart-container {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.chart-placeholder {
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.chart-bar {
+  width: 12px;
+  border-radius: 6px;
+  background-color: #e0e8ff;
+  transition: height 0.3s;
+}
+
+/* Accordion Sections */
+.accordion-section {
+  background-color: white;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.accordion-header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e8f0f0;
+  cursor: pointer;
+}
+
+.accordion-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.table-container {
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #f8f9fa;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  color: #666;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+.race-info, .team-info, .driver-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.race-icon {
+  background-color: #ff6b6b;
+}
+
+.team-icon {
+  background-color: #9c6bff;
+}
+
+.driver-icon {
+  background-color: #5c9fff;
+}
+
+.season-icon {
+  background-color: #ffa26b;
+} 

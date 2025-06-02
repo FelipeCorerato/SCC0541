@@ -2,211 +2,17 @@ import { useState } from 'react'
 import wallpaper from './assets/wallpaper.jpg'
 import './App.css'
 import './styles/Dashboard.css'
-
-// Mock Dashboard component without react-icons
-const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
-  return (
-    <div className="dashboard-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="logout-button">
-          <button onClick={onLogout}>
-            Exit
-          </button>
-        </div>
-
-        <div className="admin-profile">
-          <div className="avatar">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Admin" />
-          </div>
-          <h2>Admin</h2>
-        </div>
-
-        <nav className="sidebar-nav">
-          <ul>
-            <li className="active">Summary</li>
-            <li>Records</li>
-            <li>Reports</li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="main-content">
-        <h1>Summary</h1>
-
-        {/* Chart */}
-        <div className="chart-container">
-          <div className="chart-placeholder">
-            {Array.from({ length: 24 }).map((_, index) => (
-              <div 
-                key={index} 
-                className="chart-bar" 
-                style={{ 
-                  height: `${Math.random() * 80 + 20}px`,
-                  backgroundColor: index === 18 ? '#4285f4' : '#e0e8ff'
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Accordion sections */}
-        <div className="accordion-section">
-          <div className="accordion-header">
-            <h2>Races in 2025</h2>
-            <span>▼</span>
-          </div>
-          
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Race</th>
-                  <th>Laps</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div className="race-info">
-                      <div className="icon race-icon">
-                        🏎️
-                      </div>
-                      <span>Makonha Race</span>
-                    </div>
-                  </td>
-                  <td>15</td>
-                  <td>1:23:45</td>
-                </tr>
-                <tr>
-                  <td>
-                    <div className="race-info">
-                      <div className="icon race-icon">
-                        🏎️
-                      </div>
-                      <span>Pamonha Race</span>
-                    </div>
-                  </td>
-                  <td>69</td>
-                  <td>4:20:00</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="accordion-section">
-          <div className="accordion-header">
-            <h2>Teams in 2025</h2>
-            <span>▼</span>
-          </div>
-          
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div className="team-info">
-                      <div className="icon team-icon">
-                        🏁
-                      </div>
-                      <span>Tronca Verde</span>
-                    </div>
-                  </td>
-                  <td>100</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="accordion-section">
-          <div className="accordion-header">
-            <h2>Drivers in 2025</h2>
-            <span>▼</span>
-          </div>
-          
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div className="driver-info">
-                      <div className="icon driver-icon">
-                        👨‍🏁
-                      </div>
-                      <span>Seu Makonha</span>
-                    </div>
-                  </td>
-                  <td>420</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Summary sidebar */}
-      <div className="summary-sidebar">
-        <div className="summary-header">
-          <h2>Total</h2>
-          <span>⋮</span>
-        </div>
-
-        <div className="summary-cards">
-          <div className="summary-card">
-            <div className="icon driver-icon">
-              👨‍🏁
-            </div>
-            <div className="summary-content">
-              <h3>Drivers</h3>
-              <p>10</p>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="icon team-icon">
-              🏁
-            </div>
-            <div className="summary-content">
-              <h3>Teams</h3>
-              <p>50</p>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="icon season-icon">
-              ⏱️
-            </div>
-            <div className="summary-content">
-              <h3>Seasons</h3>
-              <p>100</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import Sidebar from './components/Sidebar'
+import TotalSidebar from './components/TotalSidebar'
+import Resumo from './components/Resumo'
+import Cadastro from './components/Cadastro'
+import Relatorios from './components/Relatorios'
 
 function App() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [activeScreen, setActiveScreen] = useState('resumo')
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -218,10 +24,29 @@ function App() {
     setIsLoggedIn(false)
     setUsername('')
     setPassword('')
+    setActiveScreen('resumo')
+  }
+
+  const handleNavigate = (screen: string) => {
+    setActiveScreen(screen)
   }
 
   if (isLoggedIn) {
-    return <Dashboard onLogout={handleLogout} />
+    return (
+      <div className="dashboard-container">
+        <Sidebar 
+          activeScreen={activeScreen} 
+          onNavigate={handleNavigate} 
+          onLogout={handleLogout} 
+        />
+        
+        {activeScreen === 'resumo' && <Resumo />}
+        {activeScreen === 'cadastros' && <Cadastro />}
+        {activeScreen === 'relatorios' && <Relatorios />}
+        
+        <TotalSidebar />
+      </div>
+    )
   }
 
   return (
@@ -239,7 +64,7 @@ function App() {
               <h2>F1 Data Explorer</h2>
             </div>
             
-            <h1>Welcome</h1>
+            <h1>Bem-vindo</h1>
           </div>
           
           <form onSubmit={handleLogin}>
@@ -247,24 +72,24 @@ function App() {
               <label>Login</label>
               <input 
                 type="text" 
-                placeholder="Username"
+                placeholder="Usuário"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             
             <div className="form-group">
-              <label>Password</label>
+              <label>Senha</label>
               <input 
                 type="password" 
-                placeholder="Enter your password"
+                placeholder="Digite sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             
             <button type="submit" className="login-button">
-              Sign in
+              Entrar
             </button>
           </form>
         </div>
