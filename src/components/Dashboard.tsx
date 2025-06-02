@@ -1,17 +1,25 @@
-import { useState } from 'react'
-import wallpaper from './assets/wallpaper.jpg'
-import './App.css'
-import './styles/Dashboard.css'
+import React from 'react';
+import '../styles/Dashboard.css';
 
-// Mock Dashboard component without react-icons
-const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
+// Icons
+import { FaUser, FaChartBar, FaClipboardList, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { IoCarSport } from 'react-icons/io5';
+import { GiRaceCar } from 'react-icons/gi';
+import { MdTimer } from 'react-icons/md';
+import { BsThreeDotsVertical } from 'react-icons/bs';
+
+interface DashboardProps {
+  onLogout: () => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
       <div className="sidebar">
         <div className="logout-button">
           <button onClick={onLogout}>
-            Exit
+            <FaSignOutAlt /> Exit
           </button>
         </div>
 
@@ -24,9 +32,9 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
 
         <nav className="sidebar-nav">
           <ul>
-            <li className="active">Summary</li>
-            <li>Records</li>
-            <li>Reports</li>
+            <li className="active"><FaChartBar /> Summary</li>
+            <li><FaClipboardList /> Records</li>
+            <li><FaClipboardList /> Reports</li>
           </ul>
         </nav>
       </div>
@@ -37,6 +45,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
 
         {/* Chart */}
         <div className="chart-container">
+          {/* This is a placeholder for the chart */}
           <div className="chart-placeholder">
             {Array.from({ length: 24 }).map((_, index) => (
               <div 
@@ -55,7 +64,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
         <div className="accordion-section">
           <div className="accordion-header">
             <h2>Races in 2025</h2>
-            <span>▼</span>
+            <FaChevronDown />
           </div>
           
           <div className="table-container">
@@ -72,7 +81,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
                   <td>
                     <div className="race-info">
                       <div className="icon race-icon">
-                        🏎️
+                        <GiRaceCar />
                       </div>
                       <span>Makonha Race</span>
                     </div>
@@ -84,7 +93,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
                   <td>
                     <div className="race-info">
                       <div className="icon race-icon">
-                        🏎️
+                        <GiRaceCar />
                       </div>
                       <span>Pamonha Race</span>
                     </div>
@@ -100,7 +109,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
         <div className="accordion-section">
           <div className="accordion-header">
             <h2>Teams in 2025</h2>
-            <span>▼</span>
+            <FaChevronDown />
           </div>
           
           <div className="table-container">
@@ -116,7 +125,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
                   <td>
                     <div className="team-info">
                       <div className="icon team-icon">
-                        🏁
+                        <IoCarSport />
                       </div>
                       <span>Tronca Verde</span>
                     </div>
@@ -131,7 +140,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
         <div className="accordion-section">
           <div className="accordion-header">
             <h2>Drivers in 2025</h2>
-            <span>▼</span>
+            <FaChevronDown />
           </div>
           
           <div className="table-container">
@@ -147,7 +156,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
                   <td>
                     <div className="driver-info">
                       <div className="icon driver-icon">
-                        👨‍🏁
+                        <FaUser />
                       </div>
                       <span>Seu Makonha</span>
                     </div>
@@ -164,13 +173,13 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
       <div className="summary-sidebar">
         <div className="summary-header">
           <h2>Total</h2>
-          <span>⋮</span>
+          <BsThreeDotsVertical />
         </div>
 
         <div className="summary-cards">
           <div className="summary-card">
             <div className="icon driver-icon">
-              👨‍🏁
+              <FaUser />
             </div>
             <div className="summary-content">
               <h3>Drivers</h3>
@@ -180,7 +189,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
 
           <div className="summary-card">
             <div className="icon team-icon">
-              🏁
+              <IoCarSport />
             </div>
             <div className="summary-content">
               <h3>Teams</h3>
@@ -190,7 +199,7 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
 
           <div className="summary-card">
             <div className="icon season-icon">
-              ⏱️
+              <MdTimer />
             </div>
             <div className="summary-content">
               <h3>Seasons</h3>
@@ -203,74 +212,4 @@ const Dashboard = ({ onLogout }: { onLogout: () => void }) => {
   );
 };
 
-function App() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    // No actual authentication, just switch to dashboard
-    setIsLoggedIn(true)
-  }
-
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    setUsername('')
-    setPassword('')
-  }
-
-  if (isLoggedIn) {
-    return <Dashboard onLogout={handleLogout} />
-  }
-
-  return (
-    <div className="login-container">
-      <div className="login-wallpaper">
-        <img src={wallpaper} alt="Formula 1" />
-      </div>
-      <div className="login-form-container">
-        <div className="login-form">
-          <div className="login-header">
-            <div className="login-logo">
-              <div className="logo-circle">
-                <div className="logo-gradient"></div>
-              </div>
-              <h2>F1 Data Explorer</h2>
-            </div>
-            
-            <h1>Welcome</h1>
-          </div>
-          
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label>Login</label>
-              <input 
-                type="text" 
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Password</label>
-              <input 
-                type="password" 
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            
-            <button type="submit" className="login-button">
-              Sign in
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default App
+export default Dashboard; 

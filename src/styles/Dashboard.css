@@ -1,0 +1,271 @@
+/* Dashboard styles */
+.dashboard-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 220px;
+  background-color: #3a9b9b;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.logout-button {
+  margin-bottom: 20px;
+}
+
+.logout-button button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 20px;
+  color: white;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-profile h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  margin-top: 20px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-nav li {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 8px;
+  padding-left: 10px;
+}
+
+.sidebar-nav li.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+.sidebar-nav li:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+.main-content h1 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Chart */
+.chart-container {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.chart-placeholder {
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.chart-bar {
+  width: 12px;
+  border-radius: 6px;
+  background-color: #e0e8ff;
+  transition: height 0.3s;
+}
+
+/* Accordion Sections */
+.accordion-section {
+  background-color: white;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.accordion-header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e8f0f0;
+  cursor: pointer;
+}
+
+.accordion-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.table-container {
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #f8f9fa;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  color: #666;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+.race-info, .team-info, .driver-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.race-icon {
+  background-color: #ff6b6b;
+}
+
+.team-icon {
+  background-color: #9c6bff;
+}
+
+.driver-icon {
+  background-color: #5c9fff;
+}
+
+.season-icon {
+  background-color: #ffa26b;
+}
+
+/* Summary Sidebar */
+.summary-sidebar {
+  width: 280px;
+  background-color: white;
+  padding: 30px 20px;
+  border-left: 1px solid #eee;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.summary-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.summary-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  transition: transform 0.3s;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+}
+
+.summary-content h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.summary-content p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+} 
