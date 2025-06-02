@@ -1,12 +1,12 @@
-/* Resumo page styles */
-.resumo-content {
+/* Summary page styles */
+.summary-content {
   flex: 1;
   padding: 30px 40px;
   overflow-y: auto;
   background-color: #f8f9fa;
 }
 
-.resumo-content h1 {
+.summary-content h1 {
   margin-bottom: 30px;
   font-size: 28px;
   font-weight: 600;

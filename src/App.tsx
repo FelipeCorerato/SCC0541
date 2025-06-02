@@ -4,9 +4,9 @@ import './App.css'
 import './styles/Dashboard.css'
 import Sidebar from './components/Sidebar'
 import TotalSidebar from './components/TotalSidebar'
-import Resumo from './components/Resumo'
-import Cadastro from './components/Cadastro'
-import Relatorios from './components/Relatorios'
+import Summary from './components/Resumo'
+import Records from './components/Cadastro'
+import Reports from './components/Relatorios'
 
 function App() {
   const [username, setUsername] = useState('')
@@ -40,9 +40,9 @@ function App() {
           onLogout={handleLogout} 
         />
         
-        {activeScreen === 'resumo' && <Resumo />}
-        {activeScreen === 'cadastros' && <Cadastro />}
-        {activeScreen === 'relatorios' && <Relatorios />}
+        {activeScreen === 'resumo' && <Summary />}
+        {activeScreen === 'cadastros' && <Records />}
+        {activeScreen === 'relatorios' && <Reports />}
         
         <TotalSidebar />
       </div>

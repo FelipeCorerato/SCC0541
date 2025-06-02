@@ -1,99 +1,182 @@
-/* Relatorios page styles */
-.relatorios-content {
+/* Reports page styles */
+.reports-content {
   flex: 1;
   padding: 30px 40px;
   overflow-y: auto;
   background-color: #f8f9fa;
 }
 
-.relatorios-content h1 {
+.reports-content h1 {
   margin-bottom: 30px;
   font-size: 28px;
   font-weight: 600;
   color: #333;
 }
 
-.relatorios-section {
+.visualize-section {
   background-color: white;
   border-radius: 10px;
   padding: 25px 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.relatorios-section h2 {
+.visualize-section h2 {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 25px;
   color: #333;
 }
 
-.relatorios-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.relatorio-card {
+/* Tabs */
+.report-tabs {
   display: flex;
   gap: 15px;
-  padding: 20px;
-  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background-color: #f0f0f0;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.tab:hover:not(.active) {
+  background-color: #e0e0e0;
+}
+
+.tab.active {
   background-color: #f8f9fa;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: 1px solid #eee;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.relatorio-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-}
-
-.relatorio-icon {
-  font-size: 28px;
-  background-color: #e0e8ff;
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
+/* Icon styles */
+.icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  font-size: 18px;
 }
 
-.relatorio-details {
-  flex: 1;
+.status-icon {
+  background-color: #5c9fff;
 }
 
-.relatorio-details h3 {
+.airport-icon {
+  background-color: #7fc97f;
+}
+
+.race-icon {
+  background-color: #cd4747;
+}
+
+/* Status Results */
+.status-results, .airports-results {
+  margin-top: 20px;
+}
+
+.status-results h3, .airports-results h3 {
   font-size: 16px;
   font-weight: 600;
+  color: #333;
   margin-bottom: 10px;
+}
+
+.status-description, .airports-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.status-list, .airports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-item, .airport-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: transform 0.2s;
+}
+
+.status-item:hover, .airport-item:hover {
+  transform: translateX(5px);
+  background-color: #f0f0f0;
+}
+
+.status-icon-container, .airport-icon-container {
+  margin-right: 15px;
+}
+
+.status-name, .airport-name {
+  flex: 1;
+  font-size: 14px;
   color: #333;
 }
 
-.relatorio-details p {
+.status-count, .airport-distance {
   font-size: 14px;
-  color: #666;
-  margin-bottom: 15px;
-  line-height: 1.4;
+  font-weight: 600;
+  color: #333;
+  padding-right: 10px;
 }
 
-.download-button {
+/* Airport search */
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.airport-search {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.airport-search:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+}
+
+.search-button {
   background-color: #4285f4;
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 15px;
-  font-size: 13px;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.download-button:hover {
+.search-button:hover {
   background-color: #3367d6;
 }
 
 @media (max-width: 768px) {
-  .relatorios-cards {
-    grid-template-columns: 1fr;
+  .report-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .search-container {
+    flex-direction: column;
   }
 } 

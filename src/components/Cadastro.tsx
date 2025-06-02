@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import '../styles/Cadastro.css';
 
-interface CadastroProps {
+interface RecordsProps {
   // Props if needed
 }
 
-const Cadastro: React.FC<CadastroProps> = () => {
-  const [activeTab, setActiveTab] = useState<'piloto' | 'escudeira'>('piloto');
+const Records: React.FC<RecordsProps> = () => {
+  const [activeTab, setActiveTab] = useState<'driver' | 'team'>('driver');
   
   // Form state
   const [driverForm, setDriverForm] = useState({
@@ -30,22 +30,22 @@ const Cadastro: React.FC<CadastroProps> = () => {
 
   const handleDriverSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Formulário de piloto enviado:', driverForm);
-    // Aqui você trataria o envio do formulário (chamada API, etc.)
+    console.log('Driver form submitted:', driverForm);
+    // Here you would handle the form submission (API call, etc.)
   };
 
   return (
     <>
-      <div className="cadastro-content">
+      <div className="records-content">
         <h1>Cadastro</h1>
 
-        <div className="cadastro-section">
+        <div className="records-section">
           <h2>Cadastrar</h2>
           
-          <div className="cadastro-tabs">
+          <div className="records-tabs">
             <div 
-              className={`tab ${activeTab === 'piloto' ? 'active' : ''}`}
-              onClick={() => setActiveTab('piloto')}
+              className={`tab ${activeTab === 'driver' ? 'active' : ''}`}
+              onClick={() => setActiveTab('driver')}
             >
               <div className="icon driver-icon">
                 <span>👤</span>
@@ -54,8 +54,8 @@ const Cadastro: React.FC<CadastroProps> = () => {
             </div>
             
             <div 
-              className={`tab ${activeTab === 'escudeira' ? 'active' : ''}`}
-              onClick={() => setActiveTab('escudeira')}
+              className={`tab ${activeTab === 'team' ? 'active' : ''}`}
+              onClick={() => setActiveTab('team')}
             >
               <div className="icon team-icon">
                 <span>🏎️</span>
@@ -64,7 +64,7 @@ const Cadastro: React.FC<CadastroProps> = () => {
             </div>
           </div>
 
-          {activeTab === 'piloto' && (
+          {activeTab === 'driver' && (
             <div className="form-container">
               <h3>Dados do piloto</h3>
               
@@ -166,7 +166,7 @@ const Cadastro: React.FC<CadastroProps> = () => {
             </div>
           )}
           
-          {activeTab === 'escudeira' && (
+          {activeTab === 'team' && (
             <div className="form-container">
               <h3>Dados da escudeira</h3>
               <p>Formulário de cadastro de escudeira será implementado aqui.</p>
@@ -175,9 +175,9 @@ const Cadastro: React.FC<CadastroProps> = () => {
         </div>
       </div>
 
-      {/* A sidebar direita é implementada no App.tsx */}
+      {/* Right sidebar is implemented in App.tsx */}
     </>
   );
 };
 
-export default Cadastro; 
+export default Records; 

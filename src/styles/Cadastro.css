@@ -1,20 +1,20 @@
-/* Cadastro page styles */
-.cadastro-content {
+/* Records page styles */
+.records-content {
   flex: 1;
   padding: 30px 40px;
   overflow-y: auto;
   background-color: #f8f9fa;
 }
 
-.cadastro-content h1 {
+.records-content h1 {
   margin-bottom: 25px;
   font-size: 28px;
   font-weight: 600;
   color: #333;
 }
 
-/* Cadastro section */
-.cadastro-section {
+/* Records section */
+.records-section {
   background-color: white;
   border-radius: 10px;
   padding: 25px 30px;
@@ -22,7 +22,7 @@
   max-width: 900px;
 }
 
-.cadastro-section h2 {
+.records-section h2 {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -30,7 +30,7 @@
 }
 
 /* Tabs */
-.cadastro-tabs {
+.records-tabs {
   display: flex;
   gap: 15px;
   margin-bottom: 25px;

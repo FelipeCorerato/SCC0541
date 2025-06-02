@@ -1,9 +1,9 @@
 import React from 'react';
 import '../styles/Resumo.css';
 
-const Resumo: React.FC = () => {
+const Summary: React.FC = () => {
   return (
-    <div className="resumo-content">
+    <div className="summary-content">
       <h1>Resumo</h1>
 
       {/* Chart */}
@@ -133,4 +133,4 @@ const Resumo: React.FC = () => {
   );
 };
 
-export default Resumo; 
+export default Summary; 
