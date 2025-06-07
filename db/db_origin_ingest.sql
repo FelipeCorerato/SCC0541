@@ -1,3 +1,35 @@
+/*
+  - Cria as tabelas do db original de F1;
+  - Realiza o ingest segundo os arquivos;
+*/
+
+--==============================================================================================================
+
+CREATE OR REPLACE FUNCTION Public.LoadFile (Diret TEXT, FN TEXT, Tab TEXT, Delimiter TEXT)
+    RETURNS INT AS $$
+  DECLARE
+    CMD Text;   Tot INT:=0;
+  BEGIN
+    RAISE NOTICE 'Carregando %', Tab;
+    IF FN IS NOT NULL THEN
+        EXECUTE 'COPY '||Tab||' FROM '''||Diret||FN||''' WITH ('||Delimiter||')';
+        -- CMD:=Substring(Tab, '(.+)\(.'); 
+        -- Apaga a extensão do arquivo
+        CMD:=regexp_replace(Tab, '(\....)', '');
+        IF CMD IS NULL THEN CMD:=Tab; END IF;
+        CMD:='SELECT COUNT(*) FROM '|| CMD;
+        EXECUTE CMD INTO Tot;
+        RAISE NOTICE 'Carregada Tabela %:= %', Tab, Tot;
+        END IF;
+    RETURN Tot;
+    END;
+$$  LANGUAGE plpgsql VOLATILE RETURNS NULL ON NULL INPUT;
+
+
+DO $$ DECLARE DirLocal TEXT; BEGIN
+	DirLocal:= '/home/ana/Área de Trabalho/TrabBD/';
+
+--==============================================================================================================
 --== Define todas as tabelas ===================================================================================
 
 --== Formula 1
@@ -240,6 +272,62 @@ CREATE TABLE GeoCities15KTEXT(
     Tupla TEXT
     );
 
+
+--==============================================================================================================
+--== Carrega as tabelas ========================================================================================
+
+PERFORM LoadFile(DirLocal, 'circuits.csv', 'Circuits', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'constructors.csv', 'Constructors', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+-- PERFORM LoadFile(DirLocal, 'ConstructorResults.csv', 'ConstructorResults', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+-- PERFORM LoadFile(DirLocal, 'ConstructorStandings.csv', 'ConstructorStandings', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'driver_standings.csv', 'DriverStandings', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'drivers.csv', 'Driver', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'lap_times.csv', 'LapTimes', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'pit_stops.csv', 'PitStops', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'qualifying.csv', 'Qualifying', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'races.csv', 'Races', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'results.csv', 'Results', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'seasons.csv', 'Seasons', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'status.csv', 'Status', 'DELIMITER '','', NULL ''\N'', HEADER true, FORMAT CSV');
+
+PERFORM LoadFile(DirLocal, 'airports.csv', 'Airports', 'DELIMITER '','', NULL '''', HEADER true, FORMAT CSV');
+PERFORM LoadFile(DirLocal, 'countries.csv', 'Countries', 'DELIMITER '','', NULL '''', HEADER true, FORMAT CSV');
+
+---- -- Faz a leitura da tabela Cities15K como uma coleção de linhas ---------------------------------------------------
+PERFORM LoadFile(DirLocal, 'cities15000.tsv', 'GeoCities15KTEXT', 'DELIMITER E''\b'', NULL '''', HEADER false');
+END $$;
+
+---- -- Tratar a tabela GeoCities15K ------------------------------------------------------------------------
+---- -- Copia cada linha isolando cada valor como um campo de texto separado em cada atributo da tabela alvo.
+----    Executa os comandos dentro de uma transação para executar as converções no Estilo de data usado no arquivo 
+----    lido, e depois retornar para o estilo original da base de dados.
+START TRANSACTION; --======================================================================
+
+SET DateStyle to YMD, ISO;
+INSERT INTO GeoCities15K 
+    SELECT (string_to_array(Tupla, E'\t'))[1]::INTEGER AS GeoNameId,
+           (string_to_array(Tupla, E'\t'))[2]  AS Name,
+           (string_to_array(Tupla, E'\t'))[3]  AS AsciiName,
+           (string_to_array(Tupla, E'\t'))[4]  AS AlternateNames,
+           NULLIF((string_to_array(Tupla, E'\t'))[5],'')::NUMERIC(13,5) AS Lat,
+           NULLIF((string_to_array(Tupla, E'\t'))[6],'')::NUMERIC(13,5) AS Long,
+           (string_to_array(Tupla, E'\t'))[7]  AS FeatureClass,
+           (string_to_array(Tupla, E'\t'))[8]  AS FeatureCode,
+           (string_to_array(Tupla, E'\t'))[9]  AS Country,
+           (string_to_array(Tupla, E'\t'))[10] AS CC2,
+           (string_to_array(Tupla, E'\t'))[11] AS Admin1Code,
+           (string_to_array(Tupla, E'\t'))[12] AS Admin2Code,
+           (string_to_array(Tupla, E'\t'))[13] AS Admin3Code,
+           (string_to_array(Tupla, E'\t'))[14] AS Admin4Code,
+           NULLIF((string_to_array(Tupla, E'\t'))[15],'')::BIGINT  AS Population,
+           NULLIF((string_to_array(Tupla, E'\t'))[16],'')::INTEGER AS Elevation,
+           NULLIF((string_to_array(Tupla, E'\t'))[17],'')::INTEGER AS DEM,
+           (string_to_array(Tupla, E'\t'))[18] AS TimeZone,
+           NULLIF((string_to_array(Tupla, E'\t'))[19],'')::DATE AS Modification
+       FROM GeoCities15KTEXT;
+DROP TABLE GeoCities15KTEXT; -- A tabela em formato de texto já pode ser descartada.
+COMMIT;
+
 --==============================================================================================================
 --== Corrige os dados das tabelas para o objetivo do projeto ===================================================
 
@@ -295,143 +383,3 @@ CREATE VIEW Tables AS
     SELECT 'GeoCities15K'         AS Table, Count(*) NroTuplas FROM GeoCities15K;
 
 Table Tables;
-
-
---=====================================================
-
-CREATE TABLE USERS (
-	UserId SERIAL,
-	Login TEXT NOT NULL UNIQUE,
-	Password TEXT NOT NULL,
-	Tipo VARCHAR(15) NOT NULL,
-	IdOriginal INTEGER NOT NULL,
-	CONSTRAINT PK_USERS PRIMARY KEY (UserId),
-	CONSTRAINT TIPO_CHECK CHECK(Tipo in ('Administrador', 'Escuderia', 'Piloto'))
-);
-
---=====================================================
-
--- Encriptação padrão
--- SET password_encryption = 'scram-sha-256';
-
--- Extenção para encriptação
--- CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
---=====================================================
-
--- Inserir dados da tabela Constructors para users
-INSERT INTO Users (Login, Password, Tipo, IdOriginal)
-SELECT 
-	ConstructorRef || '_c',
-	ConstructorRef,
-	'Escuderia',
-	ConstructorId
-FROM Constructors;
-
-CREATE OR REPLACE FUNCTION Sync_Constructor_Users()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF TG_OP = 'INSERT' AND EXISTS (SELECT 1 FROM Users WHERE Login = NEW.ConstructorRef || '_c') THEN
-    RAISE EXCEPTION 'Login já existe';
-    RETURN NULL; -- Cancela a inserção
-  END IF;
-
-  IF TG_OP = 'INSERT' THEN
-    INSERT INTO Users (Login, Password, Tipo, IdOriginal)
-    VALUES (NEW.ConstructorRef || '_c', NEW.ConstructorRef, 'Escuderia', NEW.ConstructorId);
-    
-  ELSIF TG_OP = 'UPDATE' THEN
-    IF EXISTS (SELECT 1 FROM Users 
-               WHERE Login = NEW.ConstructorRef || '_c' 
-               AND IdOriginal != OLD.ConstructorId) THEN
-      RAISE EXCEPTION 'Login já existe';
-      RETURN NULL;
-    END IF;
-	
-    UPDATE Users
-    SET
-      Login = NEW.ConstructorRef || '_c',
-      Password = NEW.ConstructorRef,
-      Tipo = 'Escuderia',
-      IdOriginal = NEW.ConstructorId
-    WHERE IdOriginal = OLD.ConstructorId AND Tipo = 'Escuderia';
-  END IF;
-
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_constructor_sync
-AFTER INSERT OR UPDATE ON Constructors
-FOR EACH ROW
-EXECUTE FUNCTION Sync_Constructor_Users();
-
-
---=====================================================
-
--- Inserir dados da tabela Driver para users
-INSERT INTO Users (Login, Password, Tipo, IdOriginal)
-SELECT 
-	DriverRef || '_d',
-	DriverRef,
-	'Piloto',
-	DriverId
-FROM Driver;
-
-CREATE OR REPLACE FUNCTION Sync_Driver_Users()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF TG_OP = 'INSERT' AND EXISTS (SELECT 1 FROM Users WHERE Login = NEW.DriverRef || '_d') THEN
-    RAISE EXCEPTION 'Login já existe';
-    RETURN NULL; -- Cancela a inserção
-  END IF;
-  
-  IF TG_OP = 'INSERT' THEN
-    INSERT INTO Users (Login, Password, Tipo, IdOriginal)
-    VALUES (NEW.DriverRef || '_d', NEW.DriverRef, 'Piloto', NEW.DriverId);
-    
-  ELSIF TG_OP = 'UPDATE' THEN
-    IF EXISTS (SELECT 1 FROM Users 
-               WHERE Login = NEW.DriverRef || '_d' 
-               AND IdOriginal != OLD.DriverId) THEN
-      RAISE EXCEPTION 'Login já existe';
-      RETURN NULL;
-    END IF;
-	
-    UPDATE Users
-    SET
-      Login = NEW.DriverRef || '_d',
-      Password = NEW.DriverRef,
-      Tipo = 'Piloto',
-      IdOriginal = NEW.DriverId
-    WHERE IdOriginal = OLD.DriverId AND Tipo = 'Piloto';
-  END IF;
-
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_driver_sync
-AFTER INSERT OR UPDATE ON Driver
-FOR EACH ROW
-EXECUTE FUNCTION Sync_Driver_Users();
-
---=====================================================
-
-INSERT INTO Users (Login, Password, Tipo, IdOriginal)
-VALUES (
-	'admin',
-	'admin',
-	'Administrador',
-	0
-);
-
---=====================================================
-
-CREATE TABLE Users_Log (
-	UserId INTEGER,
-	DataHora TIMESTAMP NOT NULL,
-	CONSTRAINT PK_UsersLog PRIMARY KEY (UserId)
-);
-
-select * from users
