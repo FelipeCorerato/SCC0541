@@ -1,6 +1,8 @@
 /*
   - Cria as tabelas do db original de F1;
   - Realiza o ingest segundo os arquivos;
+
+  OBS: A linha 32 deve ser alterada conforme a localização real dos arquivos do ingest
 */
 
 --==============================================================================================================
@@ -27,7 +29,7 @@ $$  LANGUAGE plpgsql VOLATILE RETURNS NULL ON NULL INPUT;
 
 
 DO $$ DECLARE DirLocal TEXT; BEGIN
-	DirLocal:= '/home/ana/Área de Trabalho/TrabBD/';
+	DirLocal:= '/local/dos/arquivos/';
 
 --==============================================================================================================
 --== Define todas as tabelas ===================================================================================
