@@ -16,8 +16,6 @@ ORDER BY total DESC;
 
 -- RELATÓRIO 2: Aeroportos até 100km de cidades com mesmo nome
 
-CREATE INDEX idx_airports_city_type_country ON Airports(city, type, isocountry);
-
 -- Função para calcular distância Haversine (em km)
 CREATE OR REPLACE FUNCTION haversine(lat1 DOUBLE PRECISION, lon1 DOUBLE PRECISION, lat2 DOUBLE PRECISION, lon2 DOUBLE PRECISION)
 RETURNS DOUBLE PRECISION AS $$
@@ -79,7 +77,7 @@ JOIN circuits c ON c.circuitid = r.circuitid
 JOIN results res ON res.raceid = r.raceid
 GROUP BY r.circuitid, c.name;
 
--- SELECT * FROM vw_admin_corridas_por_circuito
+-- SELECT * FROM vw_admin_corridas_por_circuito;
 
 -- RELATÓRIO 3.3: Detalhamento por corrida
 CREATE OR REPLACE VIEW vw_admin_corridas_detalhadas AS
@@ -93,4 +91,103 @@ SELECT
 FROM Races r
 JOIN results res ON res.raceid = r.raceid;
 
--- SELECT * FROM vw_admin_corridas_detalhadas
+-- SELECT * FROM vw_admin_corridas_detalhadas;
+
+-- =============================================
+-- RELATÓRIOS PARA ESCUDERIA
+-- =============================================
+
+-- RELATÓRIO 4: Pilotos com vitórias
+CREATE OR REPLACE FUNCTION fn_escuderia_pilotos_vitorias(constr_id INT)
+RETURNS TABLE (
+    piloto TEXT,
+    vitorias BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    d.forename || ' ' || d.surname AS piloto,
+    COUNT(*) AS vitorias
+  FROM Results r
+  JOIN Driver d ON d.driverId = r.driverId
+  WHERE r.constructorId = constr_id AND r.positionOrder = 1
+  GROUP BY d.forename, d.surname
+  ORDER BY vitorias DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT * FROM fn_escuderia_pilotos_vitorias(1);
+
+-- RELATÓRIO 5: Resultados por status (escuderia)
+CREATE OR REPLACE FUNCTION fn_escuderia_resultados_por_status(constr_id INT)
+RETURNS TABLE (
+    status TEXT,
+    total BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT s.status, COUNT(*)
+  FROM Results r
+  JOIN Status s ON s.statusid = r.statusid
+  WHERE constructorId = constr_id
+  GROUP BY s.status
+  ORDER BY total;
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT * FROM fn_escuderia_resultados_por_status(2);
+
+-- =============================================
+-- RELATÓRIOS PARA PILOTO
+-- =============================================
+
+-- RELATÓRIO 6: Pontos por ano, por corrida
+CREATE OR REPLACE FUNCTION fn_piloto_pontos_por_ano(driver_id INT)
+RETURNS TABLE (
+    ano INT,
+    corrida TEXT,
+    pontos DOUBLE PRECISION
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    ra.year,
+    ra.name,
+    re.points
+  FROM Results re
+  JOIN Races ra ON ra.raceId = re.raceId
+  WHERE re.driverId = driver_id
+  ORDER BY ra.year, ra.date;
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT * FROM fn_piloto_pontos_por_ano(3);
+
+-- RELATÓRIO 7: Status dos resultados do piloto
+CREATE OR REPLACE FUNCTION fn_piloto_resultados_por_status(driver_id INT)
+RETURNS TABLE (
+    status TEXT,
+    total BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT s.status, COUNT(*)
+  FROM Results r
+  JOIN Status s ON s.statusid = r.statusid
+  WHERE driverId = driver_id
+  GROUP BY s.status
+  ORDER BY total DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT * FROM fn_piloto_resultados_por_status(3);
+
+-- =============================================
+-- ÍNDICES CRIADOS
+-- =============================================
+
+CREATE INDEX idx_results_race ON Results(raceId);
+CREATE INDEX idx_races_year ON Races(year);
+CREATE INDEX idx_airports_location ON Airports(latdeg, longdeg);
+CREATE INDEX idx_results_driver_points_race ON Results (driverId, points, raceId);
+CREATE INDEX idx_results_constructor_position_driver ON Results (constructorId, positionOrder, driverId);
