@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styles/Cadastro.css';
 import { createDriver, type Driver } from '../services/drivers';
 import { createConstructor, type Constructor } from '../services/constructors';
+import { showSuccess, showError } from '../utils/toast';
 
 interface RecordsProps {
   // Props if needed
@@ -10,7 +11,6 @@ interface RecordsProps {
 const Records: React.FC<RecordsProps> = () => {
   const [activeTab, setActiveTab] = useState<'driver' | 'team'>('driver');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   // Form state
   const [driverForm, setDriverForm] = useState({
@@ -50,7 +50,6 @@ const Records: React.FC<RecordsProps> = () => {
   const handleDriverSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitMessage(null);
 
     try {
       // Mapear os dados do formulário para a interface Driver
@@ -67,7 +66,7 @@ const Records: React.FC<RecordsProps> = () => {
 
       await createDriver(driverData);
       
-      setSubmitMessage({ type: 'success', text: 'Piloto cadastrado com sucesso!' });
+      showSuccess('Piloto cadastrado com sucesso!');
       
       // Limpar o formulário
       setDriverForm({
@@ -82,7 +81,7 @@ const Records: React.FC<RecordsProps> = () => {
       });
     } catch (error) {
       console.error('Erro ao cadastrar piloto:', error);
-      setSubmitMessage({ type: 'error', text: 'Erro ao cadastrar piloto. Tente novamente.' });
+      showError('Erro ao cadastrar piloto. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +90,6 @@ const Records: React.FC<RecordsProps> = () => {
   const handleTeamSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitMessage(null);
 
     try {
       // Mapear os dados do formulário para a interface Constructor
@@ -104,7 +102,7 @@ const Records: React.FC<RecordsProps> = () => {
 
       await createConstructor(constructorData);
       
-      setSubmitMessage({ type: 'success', text: 'Escuderia cadastrada com sucesso!' });
+      showSuccess('Escuderia cadastrada com sucesso!');
       
       // Limpar o formulário
       setTeamForm({
@@ -115,7 +113,7 @@ const Records: React.FC<RecordsProps> = () => {
       });
     } catch (error) {
       console.error('Erro ao cadastrar escuderia:', error);
-      setSubmitMessage({ type: 'error', text: 'Erro ao cadastrar escuderia. Tente novamente.' });
+      showError('Erro ao cadastrar escuderia. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -128,12 +126,6 @@ const Records: React.FC<RecordsProps> = () => {
 
         <div className="records-section">
           <h2>Cadastrar</h2>
-          
-          {submitMessage && (
-            <div className={`submit-message ${submitMessage.type}`}>
-              {submitMessage.text}
-            </div>
-          )}
           
           <div className="records-tabs">
             <div 

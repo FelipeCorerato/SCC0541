@@ -3,6 +3,7 @@ import '../styles/Resumo.css';
 import { getRaces, type Race } from '../services/races';
 import { getDrivers, type Driver } from '../services/drivers';
 import { getConstructors, type Constructor } from '../services/constructors';
+import { showError } from '../utils/toast';
 
 const Summary: React.FC = () => {
   const [races, setRaces] = useState<Race[]>([]);
@@ -24,6 +25,7 @@ const Summary: React.FC = () => {
         setConstructors(constructorsData);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
+        showError('Erro ao carregar dados do resumo. Tente novamente.');
       } finally {
         setLoading(false);
       }

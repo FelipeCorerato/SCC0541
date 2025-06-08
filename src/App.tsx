@@ -8,6 +8,8 @@ import Summary from './components/Resumo'
 import Records from './components/Cadastro'
 import Reports from './components/Relatorios'
 import { login, type User } from './services/auth'
+import { ToastContainer } from 'react-toastify'
+import { showSuccess, showError, showInfo, toastContainerConfig } from './utils/toast'
 
 function App() {
   const [username, setUsername] = useState('')
@@ -16,19 +18,19 @@ function App() {
   const [activeScreen, setActiveScreen] = useState('resumo')
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError('')
 
     try {
       const authenticatedUser = await login(username, password)
       setUser(authenticatedUser)
       setIsLoggedIn(true)
+      showSuccess('Login realizado com sucesso!')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer login')
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer login'
+      showError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -40,7 +42,7 @@ function App() {
     setUsername('')
     setPassword('')
     setActiveScreen('resumo')
-    setError('')
+    showInfo('Logout realizado com sucesso!')
   }
 
   const handleNavigate = (screen: string) => {
@@ -62,6 +64,7 @@ function App() {
         {activeScreen === 'relatorios' && <Reports />}
         
         <TotalSidebar />
+        <ToastContainer {...toastContainerConfig} />
       </div>
     )
   }
@@ -85,12 +88,6 @@ function App() {
           </div>
           
           <form onSubmit={handleLogin}>
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
-            
             <div className="form-group">
               <label>Login</label>
               <input 
@@ -121,6 +118,7 @@ function App() {
           </form>
         </div>
       </div>
+      <ToastContainer {...toastContainerConfig} />
     </div>
   )
 }
