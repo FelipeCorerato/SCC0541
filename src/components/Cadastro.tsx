@@ -20,6 +20,13 @@ const Records: React.FC<RecordsProps> = () => {
     sitePessoal: ''
   });
 
+  const [teamForm, setTeamForm] = useState({
+    nome: '',
+    nacionalidade: '',
+    usuario: '',
+    sitePessoal: ''
+  });
+
   const handleDriverFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setDriverForm(prev => ({
@@ -28,9 +35,23 @@ const Records: React.FC<RecordsProps> = () => {
     }));
   };
 
+  const handleTeamFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTeamForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleDriverSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Driver form submitted:', driverForm);
+    // Here you would handle the form submission (API call, etc.)
+  };
+
+  const handleTeamSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Team form submitted:', teamForm);
     // Here you would handle the form submission (API call, etc.)
   };
 
@@ -168,8 +189,61 @@ const Records: React.FC<RecordsProps> = () => {
           
           {activeTab === 'team' && (
             <div className="form-container">
-              <h3>Dados da escudeira</h3>
-              <p>Formulário de cadastro de escudeira será implementado aqui.</p>
+              <h3>Dados da Escuderia</h3>
+              
+              <form onSubmit={handleTeamSubmit}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Nome</label>
+                    <input 
+                      type="text" 
+                      name="nome"
+                      value={teamForm.nome}
+                      onChange={handleTeamFormChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Nacionalidade</label>
+                    <input 
+                      type="text" 
+                      name="nacionalidade"
+                      value={teamForm.nacionalidade}
+                      onChange={handleTeamFormChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group full-width">
+                    <label>Usuário</label>
+                    <input 
+                      type="text" 
+                      name="usuario"
+                      value={teamForm.usuario}
+                      onChange={handleTeamFormChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group full-width">
+                    <label>Site pessoal</label>
+                    <input 
+                      type="text" 
+                      name="sitePessoal"
+                      value={teamForm.sitePessoal}
+                      onChange={handleTeamFormChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-actions">
+                  <button type="submit" className="submit-button">
+                    Cadastrar escuderia
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </div>
