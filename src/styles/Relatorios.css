@@ -6,9 +6,64 @@
   background-color: #f8f9fa;
 }
 
-.reports-content h1 {
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 30px;
+}
+
+.reports-content h1 {
+  margin: 0;
   font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+.total-summary {
+  display: flex;
+  gap: 20px;
+}
+
+.total-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.total-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+.races-total-icon {
+  background-color: #c53030;
+}
+
+.total-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.total-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 20px;
   font-weight: 600;
   color: #333;
 }
@@ -236,25 +291,26 @@
 }
 
 .race-icon {
-  background-color: #cd4747;
+  background-color: #c53030;
 }
 
 /* Status Results */
-.status-results, .airports-results, .victories-results {
-  margin-top: 20px;
+.status-results, .airports-results, .victories-results, .races-results {
+  margin-top: 25px;
 }
 
-.status-results h3, .airports-results h3, .victories-results h3 {
-  font-size: 16px;
+.status-results h3, .airports-results h3, .victories-results h3, .races-results h3 {
+  font-size: 18px;
   font-weight: 600;
-  color: #333;
   margin-bottom: 10px;
+  color: #333;
 }
 
-.status-description, .airports-description, .victories-description {
+.status-description, .airports-description, .victories-description, .races-description {
   font-size: 14px;
   color: #666;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 /* Status Table Header */
@@ -459,4 +515,172 @@
   .escuderia-summary-sidebar {
     width: 100%;
   }
+}
+
+/* Races Table Styles */
+.races-table {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.races-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
+  gap: 20px;
+  padding: 15px 20px;
+  background-color: #e9ecef;
+  font-weight: 600;
+  font-size: 14px;
+  color: #495057;
+}
+
+.header-item {
+  display: flex;
+  align-items: center;
+}
+
+.circuit-group {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.circuit-group:last-child {
+  border-bottom: none;
+}
+
+.circuit-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
+  gap: 20px;
+  padding: 20px;
+  background-color: white;
+  align-items: center;
+}
+
+.circuit-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.circuit-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #c53030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+}
+
+.circuit-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.circuit-data {
+  font-weight: 500;
+  color: #495057;
+}
+
+.circuit-toggle {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toggle-button:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.toggle-button.expanded {
+  color: #007bff;
+}
+
+.arrow {
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.arrow.up {
+  transform: rotate(180deg);
+}
+
+.circuit-details {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+.details-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 15px 20px;
+  background-color: #e9ecef;
+  font-weight: 600;
+  font-size: 14px;
+  color: #495057;
+}
+
+.detail-header-item {
+  display: flex;
+  align-items: center;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 15px 20px;
+  background-color: white;
+  align-items: center;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-icon {
+  display: flex;
+  justify-content: center;
+}
+
+.race-detail-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #c53030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.detail-data {
+  font-size: 14px;
+  color: #495057;
+}
+
+.circuit-toggle-expanded {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
 } 
