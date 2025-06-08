@@ -3,10 +3,14 @@ import wallpaper from './assets/wallpaper.jpg'
 import './App.css'
 import './styles/Dashboard.css'
 import Sidebar from './components/Sidebar'
+import EscuderiaSidebar from './components/EscuderiaSidebar'
 import TotalSidebar from './components/TotalSidebar'
+import EscuderiaRightSidebar from './components/EscuderiaRightSidebar'
 import Summary from './components/Resumo'
 import Records from './components/Cadastro'
 import Reports from './components/Relatorios'
+import EscuderiaConsultar from './components/EscuderiaConsultar'
+import EscuderiaCadastrar from './components/EscuderiaCadastrar'
 import { login, type User } from './services/auth'
 import { ToastContainer } from 'react-toastify'
 import { showSuccess, showError, showInfo, toastContainerConfig } from './utils/toast'
@@ -27,6 +31,14 @@ function App() {
       const authenticatedUser = await login(username, password)
       setUser(authenticatedUser)
       setIsLoggedIn(true)
+      
+      // Define tela inicial baseada na role
+      if (authenticatedUser.tipo === 'Escuderia') {
+        setActiveScreen('consultar')
+      } else {
+        setActiveScreen('resumo')
+      }
+      
       showSuccess('Login realizado com sucesso!')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer login'
@@ -49,7 +61,29 @@ function App() {
     setActiveScreen(screen)
   }
 
-  if (isLoggedIn) {
+  // Renderiza experiência específica para Escuderia
+  const renderEscuderiaExperience = () => {
+    return (
+      <div className="dashboard-container">
+        <EscuderiaSidebar 
+          activeScreen={activeScreen} 
+          onNavigate={handleNavigate} 
+          onLogout={handleLogout}
+          user={user}
+        />
+        
+        {activeScreen === 'consultar' && <EscuderiaConsultar />}
+        {activeScreen === 'cadastrar' && <EscuderiaCadastrar />}
+        {activeScreen === 'relatorios' && <Reports />}
+        
+        <EscuderiaRightSidebar />
+        <ToastContainer {...toastContainerConfig} />
+      </div>
+    )
+  }
+
+  // Renderiza experiência padrão (Administrador)
+  const renderDefaultExperience = () => {
     return (
       <div className="dashboard-container">
         <Sidebar 
@@ -67,6 +101,16 @@ function App() {
         <ToastContainer {...toastContainerConfig} />
       </div>
     )
+  }
+
+  if (isLoggedIn) {
+    // Renderiza experiência baseada na role do usuário
+    if (user?.tipo === 'Escuderia') {
+      return renderEscuderiaExperience()
+    }
+    
+    // Experiência padrão para Administrador e outros tipos
+    return renderDefaultExperience()
   }
 
   return (
