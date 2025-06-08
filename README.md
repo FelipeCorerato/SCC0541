@@ -15,17 +15,17 @@ Para gerenciar seu banco via pgAdmin, siga estes passos:
    - **Name**: `f1-data-explorer`  
 
 3. Na aba **Conexão**  
-   | Campo                   | Valor                   |
-   | ----------------------- | ----------------------- |
-   | Host name/address       | `db`                    |
-   | Port                    | `5432`                  |
-   | Maintenance database    | `f1-data-explorer`      |
-   | Username                | `postgres`              |
-   | Password                | `123456789`             |
-   | Autenticação Kerberos?  | Desligado               |
+   | Campo                   | Valor                    |
+   |-------------------------|--------------------------|
+   | Host name/address       | `db`                     |
+   | Port                    | `5432`                   |
+   | Maintenance database    | `f1-data-explorer`       |
+   | Username                | `postgres`               |
+   | Password                | `123456789`              |
+   | Autenticação Kerberos?  | Desligado                |
    | Salvar senha?           | Opcional (à sua escolha) |
-   | Role                    | (deixar em branco)      |
-   | Serviço                 | (deixar em branco)      |
+   | Role                    | (deixar em branco)       |
+   | Serviço                 | (deixar em branco)       |
 
 4. **Salvar e conectar**  
 Clique em **Save**. O servidor aparecerá na árvore lateral e você poderá navegar pelas suas bases e tabelas.

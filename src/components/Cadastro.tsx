@@ -10,14 +10,14 @@ const Records: React.FC<RecordsProps> = () => {
   
   // Form state
   const [driverForm, setDriverForm] = useState({
-    nome: 'João',
-    sobrenome: 'do Gás',
-    numeroCarro: 'oahsoadojgash',
-    nacionalidade: 'do Gás',
-    dataNascimento: '25/12/2025',
-    usuario: 'Joao_do_gas',
-    codigoPiloto: '666',
-    sitePessoal: 'www.joaodogas.com.br'
+    nome: '',
+    sobrenome: '',
+    numeroCarro: '',
+    nacionalidade: '',
+    dataNascimento: '',
+    usuario: '',
+    codigoPiloto: '',
+    sitePessoal: ''
   });
 
   const handleDriverFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {

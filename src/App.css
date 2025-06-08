@@ -142,6 +142,22 @@
   background-color: #3367d6;
 }
 
+.login-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #fcc;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 @media (prefers-color-scheme: dark) {
   .login-container,
   .login-form-container,

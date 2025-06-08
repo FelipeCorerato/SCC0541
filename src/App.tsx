@@ -7,24 +7,40 @@ import TotalSidebar from './components/TotalSidebar'
 import Summary from './components/Resumo'
 import Records from './components/Cadastro'
 import Reports from './components/Relatorios'
+import { login, type User } from './services/auth'
 
 function App() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [activeScreen, setActiveScreen] = useState('resumo')
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    // No actual authentication, just switch to dashboard
-    setIsLoggedIn(true)
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const authenticatedUser = await login(username, password)
+      setUser(authenticatedUser)
+      setIsLoggedIn(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleLogout = () => {
     setIsLoggedIn(false)
+    setUser(null)
     setUsername('')
     setPassword('')
     setActiveScreen('resumo')
+    setError('')
   }
 
   const handleNavigate = (screen: string) => {
@@ -37,7 +53,8 @@ function App() {
         <Sidebar 
           activeScreen={activeScreen} 
           onNavigate={handleNavigate} 
-          onLogout={handleLogout} 
+          onLogout={handleLogout}
+          user={user}
         />
         
         {activeScreen === 'resumo' && <Summary />}
@@ -68,6 +85,12 @@ function App() {
           </div>
           
           <form onSubmit={handleLogin}>
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+            
             <div className="form-group">
               <label>Login</label>
               <input 
@@ -75,6 +98,8 @@ function App() {
                 placeholder="Usuário"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
+                required
               />
             </div>
             
@@ -85,11 +110,13 @@ function App() {
                 placeholder="Digite sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                required
               />
             </div>
             
-            <button type="submit" className="login-button">
-              Entrar
+            <button type="submit" className="login-button" disabled={isLoading}>
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
         </div>

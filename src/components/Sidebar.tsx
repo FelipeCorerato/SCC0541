@@ -1,13 +1,34 @@
 import React from 'react';
 import '../styles/Sidebar.css';
+import type { User } from '../services/auth';
 
 interface SidebarProps {
   activeScreen: string;
   onNavigate: (screen: string) => void;
   onLogout: () => void;
+  user?: User | null;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeScreen, onNavigate, onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeScreen, onNavigate, onLogout, user }) => {
+  const getUserDisplayName = () => {
+    if (!user) return 'Usuário';
+    
+    // Se for administrador, mostra "Admin"
+    if (user.tipo === 'Administrador') return 'Admin';
+    
+    // Caso contrário, mostra o login
+    return user.login;
+  };
+
+  const getUserAvatar = () => {
+    // Se for administrador, usa avatar feminino
+    if (user?.tipo === 'Administrador') {
+      return "https://randomuser.me/api/portraits/women/44.jpg";
+    }
+    // Para outros usuários, usa avatar masculino
+    return "https://randomuser.me/api/portraits/men/32.jpg";
+  };
+
   return (
     <div className="sidebar">
       <div className="logout-button">
@@ -18,9 +39,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreen, onNavigate, onLogout })
 
       <div className="admin-profile">
         <div className="avatar">
-          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Admin" />
+          <img src={getUserAvatar()} alt={getUserDisplayName()} />
         </div>
-        <h2>Admin</h2>
+        <h2>{getUserDisplayName()}</h2>
+        {user && (
+          <p className="user-type">{user.tipo}</p>
+        )}
       </div>
 
       <nav className="sidebar-nav">
