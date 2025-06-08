@@ -4,14 +4,18 @@ import './App.css'
 import './styles/Dashboard.css'
 import Sidebar from './components/Sidebar'
 import EscuderiaSidebar from './components/EscuderiaSidebar'
+import PilotoSidebar from './components/PilotoSidebar'
 import TotalSidebar from './components/TotalSidebar'
 import EscuderiaRightSidebar from './components/EscuderiaRightSidebar'
+import PilotoRightSidebar from './components/PilotoRightSidebar'
 import Summary from './components/Resumo'
 import Records from './components/Cadastro'
 import Reports from './components/Relatorios'
 import EscuderiaRelatorios from './components/EscuderiaRelatorios'
 import EscuderiaConsultar from './components/EscuderiaConsultar'
 import EscuderiaCadastrar from './components/EscuderiaCadastrar'
+import PilotoResumo from './components/PilotoResumo'
+import PilotoRelatorios from './components/PilotoRelatorios'
 import { login, type User } from './services/auth'
 import { ToastContainer } from 'react-toastify'
 import { showSuccess, showError, showInfo, toastContainerConfig } from './utils/toast'
@@ -83,6 +87,26 @@ function App() {
     )
   }
 
+  // Renderiza experiência específica para Piloto
+  const renderPilotoExperience = () => {
+    return (
+      <div className="dashboard-container">
+        <PilotoSidebar 
+          activeScreen={activeScreen} 
+          onNavigate={handleNavigate} 
+          onLogout={handleLogout}
+          user={user}
+        />
+        
+        {activeScreen === 'resumo' && <PilotoResumo />}
+        {activeScreen === 'relatorios' && <PilotoRelatorios />}
+        
+        <PilotoRightSidebar />
+        <ToastContainer {...toastContainerConfig} />
+      </div>
+    )
+  }
+
   // Renderiza experiência padrão (Administrador)
   const renderDefaultExperience = () => {
     return (
@@ -108,6 +132,8 @@ function App() {
     // Renderiza experiência baseada na role do usuário
     if (user?.tipo === 'Escuderia') {
       return renderEscuderiaExperience()
+    } else if (user?.tipo === 'Piloto') {
+      return renderPilotoExperience()
     }
     
     // Experiência padrão para Administrador e outros tipos
