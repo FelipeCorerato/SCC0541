@@ -24,6 +24,23 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
 
+  postgrest:
+    image: postgrest/postgrest:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      # Conexão ao Postgres (user:password@host:port/dbname)
+      PGRST_DB_URI: "postgres://postgres:123456789@db:5432/f1-data-explorer"
+      # Esquema que o PostgREST vai servir
+      PGRST_DB_SCHEMA: "public"
+      # Role que será usada (pode ser postgres mesmo, já que não há segurança)
+      PGRST_DB_ANON_ROLE: "postgres"
+      # Porta interna do servidor PostgREST
+      PGRST_SERVER_PORT: "3000"
+
 volumes:
   db:
     driver: local
