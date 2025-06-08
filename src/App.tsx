@@ -9,6 +9,7 @@ import EscuderiaRightSidebar from './components/EscuderiaRightSidebar'
 import Summary from './components/Resumo'
 import Records from './components/Cadastro'
 import Reports from './components/Relatorios'
+import EscuderiaRelatorios from './components/EscuderiaRelatorios'
 import EscuderiaConsultar from './components/EscuderiaConsultar'
 import EscuderiaCadastrar from './components/EscuderiaCadastrar'
 import { login, type User } from './services/auth'
@@ -74,7 +75,7 @@ function App() {
         
         {activeScreen === 'consultar' && <EscuderiaConsultar />}
         {activeScreen === 'cadastrar' && <EscuderiaCadastrar />}
-        {activeScreen === 'relatorios' && <Reports />}
+        {activeScreen === 'relatorios' && <EscuderiaRelatorios />}
         
         <EscuderiaRightSidebar />
         <ToastContainer {...toastContainerConfig} />
