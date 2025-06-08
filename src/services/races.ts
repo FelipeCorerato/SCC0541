@@ -10,9 +10,7 @@ export interface Race {
   /* adicione aqui os campos da sua tabela */
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
-
-export const getRaces = (year = CURRENT_YEAR): Promise<Race[]> =>
+export const getRaces = (): Promise<Race[]> =>
   api
     .get<Race[]>(`/races`)
     .then(res => res.data);

@@ -12,9 +12,11 @@ export interface Driver {
   url: string;
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
-
-export const getDrivers = (year = CURRENT_YEAR): Promise<Driver[]> =>
+export const getDrivers = (): Promise<Driver[]> =>
   api
     .get<Driver[]>(`/driver?order=surname.asc`)
     .then(res => res.data);
+
+export const createDriver = (driver: Omit<Driver, 'driverid'>) =>
+  api.post<Driver>('/driver', driver)
+      .then(res => res.data);

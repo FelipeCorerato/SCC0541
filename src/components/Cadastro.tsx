@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Cadastro.css';
+import { createDriver, type Driver } from '../services/drivers';
+import { createConstructor, type Constructor } from '../services/constructors';
 
 interface RecordsProps {
   // Props if needed
@@ -7,6 +9,8 @@ interface RecordsProps {
 
 const Records: React.FC<RecordsProps> = () => {
   const [activeTab, setActiveTab] = useState<'driver' | 'team'>('driver');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   // Form state
   const [driverForm, setDriverForm] = useState({
@@ -43,16 +47,78 @@ const Records: React.FC<RecordsProps> = () => {
     }));
   };
 
-  const handleDriverSubmit = (e: React.FormEvent) => {
+  const handleDriverSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Driver form submitted:', driverForm);
-    // Here you would handle the form submission (API call, etc.)
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      // Mapear os dados do formulário para a interface Driver
+      const driverData: Omit<Driver, 'driverid'> = {
+        driverref: driverForm.usuario,
+        number: parseInt(driverForm.numeroCarro) || 0,
+        code: driverForm.codigoPiloto,
+        forename: driverForm.nome,
+        surname: driverForm.sobrenome,
+        dob: driverForm.dataNascimento,
+        nationality: driverForm.nacionalidade,
+        url: driverForm.sitePessoal
+      };
+
+      await createDriver(driverData);
+      
+      setSubmitMessage({ type: 'success', text: 'Piloto cadastrado com sucesso!' });
+      
+      // Limpar o formulário
+      setDriverForm({
+        nome: '',
+        sobrenome: '',
+        numeroCarro: '',
+        nacionalidade: '',
+        dataNascimento: '',
+        usuario: '',
+        codigoPiloto: '',
+        sitePessoal: ''
+      });
+    } catch (error) {
+      console.error('Erro ao cadastrar piloto:', error);
+      setSubmitMessage({ type: 'error', text: 'Erro ao cadastrar piloto. Tente novamente.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleTeamSubmit = (e: React.FormEvent) => {
+  const handleTeamSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Team form submitted:', teamForm);
-    // Here you would handle the form submission (API call, etc.)
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      // Mapear os dados do formulário para a interface Constructor
+      const constructorData: Omit<Constructor, 'constructorid'> = {
+        constructorref: teamForm.usuario,
+        name: teamForm.nome,
+        nationality: teamForm.nacionalidade,
+        url: teamForm.sitePessoal
+      };
+
+      await createConstructor(constructorData);
+      
+      setSubmitMessage({ type: 'success', text: 'Escuderia cadastrada com sucesso!' });
+      
+      // Limpar o formulário
+      setTeamForm({
+        nome: '',
+        nacionalidade: '',
+        usuario: '',
+        sitePessoal: ''
+      });
+    } catch (error) {
+      console.error('Erro ao cadastrar escuderia:', error);
+      setSubmitMessage({ type: 'error', text: 'Erro ao cadastrar escuderia. Tente novamente.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -62,6 +128,12 @@ const Records: React.FC<RecordsProps> = () => {
 
         <div className="records-section">
           <h2>Cadastrar</h2>
+          
+          {submitMessage && (
+            <div className={`submit-message ${submitMessage.type}`}>
+              {submitMessage.text}
+            </div>
+          )}
           
           <div className="records-tabs">
             <div 
@@ -98,6 +170,7 @@ const Records: React.FC<RecordsProps> = () => {
                       name="nome"
                       value={driverForm.nome}
                       onChange={handleDriverFormChange}
+                      required
                     />
                   </div>
                   
@@ -108,6 +181,7 @@ const Records: React.FC<RecordsProps> = () => {
                       name="sobrenome"
                       value={driverForm.sobrenome}
                       onChange={handleDriverFormChange}
+                      required
                     />
                   </div>
                 </div>
@@ -116,10 +190,11 @@ const Records: React.FC<RecordsProps> = () => {
                   <div className="form-group">
                     <label>Número do carro</label>
                     <input 
-                      type="text" 
+                      type="number" 
                       name="numeroCarro"
                       value={driverForm.numeroCarro}
                       onChange={handleDriverFormChange}
+                      required
                     />
                   </div>
                   
@@ -130,16 +205,18 @@ const Records: React.FC<RecordsProps> = () => {
                       name="nacionalidade"
                       value={driverForm.nacionalidade}
                       onChange={handleDriverFormChange}
+                      required
                     />
                   </div>
                   
                   <div className="form-group">
                     <label>Data de nascimento</label>
                     <input 
-                      type="text" 
+                      type="date" 
                       name="dataNascimento"
                       value={driverForm.dataNascimento}
                       onChange={handleDriverFormChange}
+                      required
                     />
                   </div>
                 </div>
@@ -152,6 +229,7 @@ const Records: React.FC<RecordsProps> = () => {
                       name="usuario"
                       value={driverForm.usuario}
                       onChange={handleDriverFormChange}
+                      required
                     />
                   </div>
                   
@@ -162,6 +240,8 @@ const Records: React.FC<RecordsProps> = () => {
                       name="codigoPiloto"
                       value={driverForm.codigoPiloto}
                       onChange={handleDriverFormChange}
+                      maxLength={3}
+                      required
                     />
                   </div>
                 </div>
@@ -170,17 +250,18 @@ const Records: React.FC<RecordsProps> = () => {
                   <div className="form-group full-width">
                     <label>Site pessoal</label>
                     <input 
-                      type="text" 
+                      type="url" 
                       name="sitePessoal"
                       value={driverForm.sitePessoal}
                       onChange={handleDriverFormChange}
+                      placeholder="https://exemplo.com"
                     />
                   </div>
                 </div>
                 
                 <div className="form-actions">
-                  <button type="submit" className="submit-button">
-                    Cadastrar piloto
+                  <button type="submit" className="submit-button" disabled={isSubmitting}>
+                    {isSubmitting ? 'Cadastrando...' : 'Cadastrar piloto'}
                   </button>
                 </div>
               </form>
@@ -200,6 +281,7 @@ const Records: React.FC<RecordsProps> = () => {
                       name="nome"
                       value={teamForm.nome}
                       onChange={handleTeamFormChange}
+                      required
                     />
                   </div>
                   
@@ -210,6 +292,7 @@ const Records: React.FC<RecordsProps> = () => {
                       name="nacionalidade"
                       value={teamForm.nacionalidade}
                       onChange={handleTeamFormChange}
+                      required
                     />
                   </div>
                 </div>
@@ -222,6 +305,7 @@ const Records: React.FC<RecordsProps> = () => {
                       name="usuario"
                       value={teamForm.usuario}
                       onChange={handleTeamFormChange}
+                      required
                     />
                   </div>
                 </div>
@@ -230,17 +314,18 @@ const Records: React.FC<RecordsProps> = () => {
                   <div className="form-group full-width">
                     <label>Site pessoal</label>
                     <input 
-                      type="text" 
+                      type="url" 
                       name="sitePessoal"
                       value={teamForm.sitePessoal}
                       onChange={handleTeamFormChange}
+                      placeholder="https://exemplo.com"
                     />
                   </div>
                 </div>
                 
                 <div className="form-actions">
-                  <button type="submit" className="submit-button">
-                    Cadastrar escuderia
+                  <button type="submit" className="submit-button" disabled={isSubmitting}>
+                    {isSubmitting ? 'Cadastrando...' : 'Cadastrar escuderia'}
                   </button>
                 </div>
               </form>

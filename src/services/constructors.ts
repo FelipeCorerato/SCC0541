@@ -8,9 +8,11 @@ export interface Constructor {
   url: string;
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
-
-export const getConstructors = (year = CURRENT_YEAR): Promise<Constructor[]> =>
+export const getConstructors = (): Promise<Constructor[]> =>
   api
     .get<Constructor[]>(`/constructors`)
     .then(res => res.data);
+
+export const createConstructor = (constructor: Omit<Constructor, 'constructorid'>) =>
+  api.post<Constructor>('/constructors', constructor)
+      .then(res => res.data);
