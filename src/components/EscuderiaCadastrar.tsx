@@ -102,7 +102,17 @@ const EscuderiaCadastrar: React.FC = () => {
       {selectedFile && !uploadSuccess && (
         <div className="file-preview-container">
           <div className="file-preview">
-            <h3>Arquivo selecionado:</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <h3>Arquivo selecionado:</h3>
+              <button 
+                onClick={resetForm}
+                disabled={isUploading}
+                className="search-button clear-button"
+                style={{ backgroundColor: '#dc3545', padding: '5px 10px', fontSize: '14px' }}
+              >
+                Limpar
+              </button>
+            </div>
             <div className="file-info">
               <div className="file-icon">📄</div>
               <div className="file-details">
