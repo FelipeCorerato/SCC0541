@@ -99,7 +99,7 @@ $$ LANGUAGE plpgsql;
 
 
 -- =============================================
--- FUNÇÕES DE DASHBOARDS PARA ESCUDERIA 
+-- FUNÇÕES PARA DASHBOARDS DA ESCUDERIA 
 -- =============================================
 
 -- FUNÇÃO 1: Quantidade de vitórias da escuderia
@@ -154,3 +154,57 @@ BEGIN
   WHERE res.constructorId = constr_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- =============================================
+-- FUNÇÕES PARA DASHBOARDS DE PILOTO
+-- =============================================
+
+-- FUNÇÃO 1: Primeiro e último ano com dados do piloto
+-- Recebe o ID do piloto e retorna o menor e maior ano que existem registros do piloto na tabela results (via corrida).
+CREATE OR REPLACE FUNCTION fn_piloto_anos_atividade(driver_id INT)
+RETURNS TABLE (
+  primeiro_ano INT,
+  ultimo_ano INT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    MIN(r.year) AS primeiro_ano,
+    MAX(r.year) AS ultimo_ano
+  FROM results res
+  JOIN races r ON res.raceId = r.raceId
+  WHERE res.driverId = driver_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- FUNÇÃO 2: Estatísticas do piloto por ano e circuito
+-- Para cada ano e circuito em que o piloto participou, retorna a soma de pontos, quantidade de vitórias e total de corridas.
+CREATE OR REPLACE FUNCTION fn_piloto_estatisticas_ano_circuito(driver_id INT)
+RETURNS TABLE (
+  ano INT,
+  circuito_id INT,
+  circuito_nome TEXT,
+  total_pontos DOUBLE PRECISION,
+  total_vitorias BIGINT,
+  total_corridas BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    r.year AS ano,
+    r.circuitId AS circuito_id,
+    c.name AS circuito_nome,
+    COALESCE(SUM(res.points)::double precision, 0) AS total_pontos, 
+    COUNT(CASE WHEN res.positionOrder = 1 THEN 1 END) AS total_vitorias,
+    COUNT(DISTINCT res.raceId) AS total_corridas
+  FROM results res
+  JOIN races r ON res.raceId = r.raceId
+  JOIN circuits c ON r.circuitId = c.circuitId
+  WHERE res.driverId = driver_id
+  GROUP BY r.year, r.circuitId, c.name
+  ORDER BY r.year, c.name;
+END;
+$$ LANGUAGE plpgsql;
+
+
