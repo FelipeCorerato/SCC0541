@@ -73,4 +73,20 @@
 
 .season-icon {
   background-color: #ffa26b;
+}
+
+/* Error message styles */
+.error-message {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.error-message p {
+  font-size: 12px;
+  color: #c33;
+  margin: 0;
 } 
