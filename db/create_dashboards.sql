@@ -6,7 +6,7 @@
 -- Retorna o total de pilotos (drivers), escuderias (constructors) e temporadas (seasons) cadastradas no banco.
 CREATE FUNCTION get_admin_summary()
 RETURNS TABLE (
-    total_drivers bigint,
+    total_driver bigint,
     total_constructors bigint,
     total_seasons bigint
 )
@@ -14,7 +14,7 @@ AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    (SELECT COUNT(*) FROM drivers),       
+    (SELECT COUNT(*) FROM driver),       
     (SELECT COUNT(*) FROM constructors), 
     (SELECT COUNT(*) FROM seasons);      
 END;
@@ -89,7 +89,7 @@ BEGIN
     d.forename || ' ' || d.surname,      
     SUM(res.points)::DOUBLE PRECISION        -- Soma dos pontos do piloto nas corridas de 2024
   FROM results res
-  JOIN drivers d ON res.driverId = d.driverId
+  JOIN driver d ON res.driverId = d.driverId
   JOIN races r ON res.raceId = r.raceId
   WHERE r.year = 2024
   GROUP BY d.driverId, d.forename, d.surname
