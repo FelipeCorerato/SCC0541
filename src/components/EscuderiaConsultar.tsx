@@ -1,48 +1,39 @@
 import React, { useState } from 'react';
+import { searchDriversByName, type Driver } from '../services/drivers';
 import '../styles/EscuderiaConsultar.css';
-
-interface Piloto {
-  nome: string;
-  nascimento: string;
-  nacionalidade: string;
-}
 
 const EscuderiaConsultar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [pilotos, setPilotos] = useState<Piloto[]>([]);
+  const [pilotos, setPilotos] = useState<Driver[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Dados mockados para demonstração
-  const mockPilotos: Piloto[] = [
-    {
-      nome: 'Seu makonha',
-      nascimento: '05/10/1865',
-      nacionalidade: 'Butanês'
-    },
-    {
-      nome: 'Seu makonha',
-      nascimento: '02/15/2063',
-      nacionalidade: 'Jamaicano'
-    }
-  ];
-
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) return;
+    
     setIsLoading(true);
-    // Simula uma busca
-    setTimeout(() => {
-      if (searchTerm.toLowerCase().includes('makonha')) {
-        setPilotos(mockPilotos);
-      } else {
-        setPilotos([]);
-      }
+    setHasSearched(true);
+    
+    try {
+      const results = await searchDriversByName(searchTerm.trim());
+      setPilotos(results);
+    } catch (error) {
+      console.error('Erro ao buscar pilotos:', error);
+      setPilotos([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
   };
 
   return (
@@ -67,7 +58,7 @@ const EscuderiaConsultar: React.FC = () => {
             />
             <button 
               onClick={handleSearch}
-              disabled={isLoading}
+              disabled={isLoading || !searchTerm.trim()}
               className="search-button"
             >
               {isLoading ? 'Buscando...' : 'Buscar'}
@@ -85,25 +76,25 @@ const EscuderiaConsultar: React.FC = () => {
               <div className="header-cell">Nacionalidade</div>
             </div>
             
-            {pilotos.map((piloto, index) => (
-              <div key={index} className="table-row">
+            {pilotos.map((piloto) => (
+              <div key={piloto.driverid} className="table-row">
                 <div className="table-cell">
                   <div className="pilot-info">
                     <div className="pilot-avatar">
                       <span>👤</span>
                     </div>
-                    <span>{piloto.nome}</span>
+                    <span>{piloto.forename} {piloto.surname}</span>
                   </div>
                 </div>
-                <div className="table-cell">{piloto.nascimento}</div>
-                <div className="table-cell">{piloto.nacionalidade}</div>
+                <div className="table-cell">{formatDate(piloto.dob)}</div>
+                <div className="table-cell">{piloto.nationality}</div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {searchTerm && pilotos.length === 0 && !isLoading && (
+      {hasSearched && pilotos.length === 0 && !isLoading && (
         <div className="no-results-container">
           <div className="no-results">
             <div className="empty-icon">🔍</div>
