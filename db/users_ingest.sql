@@ -137,9 +137,25 @@ VALUES (
 DROP TABLE IF EXISTS Users_Log CASCADE;
 CREATE TABLE Users_Log (
 	UserId INTEGER,
-    Data DATE NOT NULL,
+  Data DATE NOT NULL,
 	Hora TIME NOT NULL,
 	CONSTRAINT PK_UsersLog PRIMARY KEY (UserId, Data, Hora)
 );
 
 CREATE INDEX idx_users_log ON Users_Log(Data);
+
+CREATE OR REPLACE FUNCTION fn_create_users_log(
+    u_id INTEGER,
+    u_data DATE,
+    u_hora TIME
+)
+RETURNS VOID AS $$
+BEGIN
+    INSERT INTO Users_Log (userid, data, hora)
+    VALUES (
+        u_id,
+        u_data,
+        u_hora
+    );
+END;
+$$ LANGUAGE plpgsql;
