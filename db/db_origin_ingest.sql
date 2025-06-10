@@ -29,7 +29,7 @@ $$  LANGUAGE plpgsql VOLATILE RETURNS NULL ON NULL INPUT;
 
 
 DO $$ DECLARE DirLocal TEXT; BEGIN
-	DirLocal:= '/local/dos/arquivos/';
+	DirLocal:= '/mnt/f1/';
 
 --==============================================================================================================
 --== Define todas as tabelas ===================================================================================
