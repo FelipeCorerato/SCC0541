@@ -81,7 +81,7 @@ function App() {
         {activeScreen === 'cadastrar' && <EscuderiaCadastrar />}
         {activeScreen === 'relatorios' && <EscuderiaRelatorios user={user} />}
         
-        <EscuderiaRightSidebar />
+        <EscuderiaRightSidebar user={user} />
         <ToastContainer {...toastContainerConfig} />
       </div>
     )

@@ -1,11 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getEscuderiaTotalVitorias, getEscuderiaTotalPilotos, getEscuderiaAnosAtividade, type EscuderiaAnosAtividade } from '../services/constructors';
+import { type User } from '../services/auth';
 import '../styles/TotalSidebar.css';
 
 interface EscuderiaRightSidebarProps {
-  // Props if needed
+  user?: User | null;
 }
 
-const EscuderiaRightSidebar: React.FC<EscuderiaRightSidebarProps> = () => {
+const EscuderiaRightSidebar: React.FC<EscuderiaRightSidebarProps> = ({ user }) => {
+  const [totalVitorias, setTotalVitorias] = useState<number>(0);
+  const [totalPilotos, setTotalPilotos] = useState<number>(0);
+  const [anosAtividade, setAnosAtividade] = useState<EscuderiaAnosAtividade | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Carregar dados quando o componente montar
+  useEffect(() => {
+    loadEscuderiaData();
+  }, [user]);
+
+  const loadEscuderiaData = async () => {
+    if (!user || !user.idoriginal) {
+      setError('Usuário não identificado ou ID da escuderia não encontrado');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Buscar todos os dados em paralelo
+      const [vitorias, pilotos, anos] = await Promise.all([
+        getEscuderiaTotalVitorias(user.idoriginal),
+        getEscuderiaTotalPilotos(user.idoriginal),
+        getEscuderiaAnosAtividade(user.idoriginal)
+      ]);
+
+      setTotalVitorias(vitorias);
+      setTotalPilotos(pilotos);
+      setAnosAtividade(anos);
+    } catch (err) {
+      setError('Erro ao carregar dados da escuderia');
+      console.error('Erro ao carregar dados da escuderia:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="total-sidebar">
       <div className="total-header">
@@ -19,7 +60,13 @@ const EscuderiaRightSidebar: React.FC<EscuderiaRightSidebarProps> = () => {
           </div>
           <div className="total-content">
             <h3>Vitórias</h3>
-            <p>50</p>
+            {isLoading ? (
+              <p>Carregando...</p>
+            ) : error ? (
+              <p>Erro</p>
+            ) : (
+              <p>{totalVitorias}</p>
+            )}
           </div>
         </div>
         
@@ -29,7 +76,13 @@ const EscuderiaRightSidebar: React.FC<EscuderiaRightSidebarProps> = () => {
           </div>
           <div className="total-content">
             <h3>Pilotos</h3>
-            <p>10</p>
+            {isLoading ? (
+              <p>Carregando...</p>
+            ) : error ? (
+              <p>Erro</p>
+            ) : (
+              <p>{totalPilotos}</p>
+            )}
           </div>
         </div>
         
@@ -39,7 +92,15 @@ const EscuderiaRightSidebar: React.FC<EscuderiaRightSidebarProps> = () => {
           </div>
           <div className="total-content">
             <h3>Primeira Atuação</h3>
-            <p>2021</p>
+            {isLoading ? (
+              <p>Carregando...</p>
+            ) : error ? (
+              <p>Erro</p>
+            ) : anosAtividade ? (
+              <p>{anosAtividade.primeiro_ano}</p>
+            ) : (
+              <p>N/A</p>
+            )}
           </div>
         </div>
         
@@ -49,7 +110,15 @@ const EscuderiaRightSidebar: React.FC<EscuderiaRightSidebarProps> = () => {
           </div>
           <div className="total-content">
             <h3>Última Atuação</h3>
-            <p>2022</p>
+            {isLoading ? (
+              <p>Carregando...</p>
+            ) : error ? (
+              <p>Erro</p>
+            ) : anosAtividade ? (
+              <p>{anosAtividade.ultimo_ano}</p>
+            ) : (
+              <p>N/A</p>
+            )}
           </div>
         </div>
       </div>

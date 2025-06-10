@@ -18,6 +18,12 @@ export interface EscuderiaPilotoVitorias {
   vitorias: number;
 }
 
+// Interface para o resultado da função fn_escuderia_anos_atividade
+export interface EscuderiaAnosAtividade {
+  primeiro_ano: number;
+  ultimo_ano: number;
+}
+
 /**
  * Chama a função get_constructors do banco de dados
  * que retorna as escuderias com a soma total dos pontos obtidos nas corridas do ano atual
@@ -73,5 +79,53 @@ export const getEscuderiaPilotosVitorias = async (constructorId: number): Promis
   } catch (error) {
     console.error('Erro ao buscar vitórias dos pilotos da escuderia:', error);
     throw new Error('Erro ao carregar dados de vitórias dos pilotos');
+  }
+};
+
+/**
+ * Chama a função fn_escuderia_total_vitorias do banco de dados
+ * que retorna o total de vitórias da escuderia
+ */
+export const getEscuderiaTotalVitorias = async (constructorId: number): Promise<number> => {
+  try {
+    const { data } = await api.post<number>('/rpc/fn_escuderia_total_vitorias', {
+      constr_id: constructorId
+    });
+    return data || 0;
+  } catch (error) {
+    console.error('Erro ao buscar total de vitórias da escuderia:', error);
+    throw new Error('Erro ao carregar total de vitórias da escuderia');
+  }
+};
+
+/**
+ * Chama a função fn_escuderia_total_pilotos do banco de dados
+ * que retorna o total de pilotos diferentes que correram pela escuderia
+ */
+export const getEscuderiaTotalPilotos = async (constructorId: number): Promise<number> => {
+  try {
+    const { data } = await api.post<number>('/rpc/fn_escuderia_total_pilotos', {
+      constr_id: constructorId
+    });
+    return data || 0;
+  } catch (error) {
+    console.error('Erro ao buscar total de pilotos da escuderia:', error);
+    throw new Error('Erro ao carregar total de pilotos da escuderia');
+  }
+};
+
+/**
+ * Chama a função fn_escuderia_anos_atividade do banco de dados
+ * que retorna o primeiro e último ano com dados da escuderia
+ */
+export const getEscuderiaAnosAtividade = async (constructorId: number): Promise<EscuderiaAnosAtividade | null> => {
+  try {
+    const { data } = await api.post<EscuderiaAnosAtividade[]>('/rpc/fn_escuderia_anos_atividade', {
+      constr_id: constructorId
+    });
+    return data && data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error('Erro ao buscar anos de atividade da escuderia:', error);
+    throw new Error('Erro ao carregar anos de atividade da escuderia');
   }
 };
