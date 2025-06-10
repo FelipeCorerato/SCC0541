@@ -8,6 +8,11 @@ export interface Constructor {
   url: string;
 }
 
+export interface EscuderiaStatus {
+  status: string;
+  total: number;
+}
+
 export const getConstructors = (): Promise<Constructor[]> =>
   api
     .get<Constructor[]>(`/constructors`)
@@ -16,3 +21,15 @@ export const getConstructors = (): Promise<Constructor[]> =>
 export const createConstructor = (constructor: Omit<Constructor, 'constructorid'>) =>
   api.post<Constructor>('/constructors', constructor)
       .then(res => res.data);
+
+export const getEscuderiaResultadosPorStatus = async (constructorId: number): Promise<EscuderiaStatus[]> => {
+  try {
+    const { data } = await api.post<EscuderiaStatus[]>('/rpc/fn_escuderia_resultados_por_status', {
+      constr_id: constructorId
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar status da escuderia:', error);
+    throw new Error('Erro ao carregar dados de status da escuderia');
+  }
+};

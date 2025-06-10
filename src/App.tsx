@@ -79,7 +79,7 @@ function App() {
         
         {activeScreen === 'consultar' && <EscuderiaConsultar />}
         {activeScreen === 'cadastrar' && <EscuderiaCadastrar />}
-        {activeScreen === 'relatorios' && <EscuderiaRelatorios />}
+        {activeScreen === 'relatorios' && <EscuderiaRelatorios user={user} />}
         
         <EscuderiaRightSidebar />
         <ToastContainer {...toastContainerConfig} />

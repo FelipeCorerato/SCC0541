@@ -1,14 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getEscuderiaResultadosPorStatus, type EscuderiaStatus } from '../services/constructors';
+import type { User } from '../services/auth';
 import '../styles/Relatorios.css';
 
-const EscuderiaRelatorios: React.FC = () => {
+interface EscuderiaRelatoriosProps {
+  user?: User | null;
+}
+
+const EscuderiaRelatorios: React.FC<EscuderiaRelatoriosProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState<'status' | 'victories'>('status');
   const [activeView, setActiveView] = useState<'status' | 'victories'>('status');
+  const [statusData, setStatusData] = useState<EscuderiaStatus[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Toggle between views when a tab is clicked
   const handleTabClick = (tab: 'status' | 'victories') => {
     setActiveTab(tab);
     setActiveView(tab);
+  };
+
+  // Carregar dados de status quando o componente montar ou quando a aba status for ativada
+  useEffect(() => {
+    if (activeView === 'status') {
+      loadStatusData();
+    }
+  }, [activeView, user]);
+
+  const loadStatusData = async () => {
+    if (!user || !user.idoriginal) {
+      setError('Usuário não identificado ou ID da escuderia não encontrado');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log({ user })
+      const data = await getEscuderiaResultadosPorStatus(user.idoriginal);
+      setStatusData(data);
+    } catch (err) {
+      setError('Erro ao carregar dados de status da escuderia');
+      console.error('Erro ao carregar status:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,64 +85,108 @@ const EscuderiaRelatorios: React.FC = () => {
                 Mostrar quantas vezes cada tipo de resultado aconteceu com os carros da escuderia em todas as corridas.
               </p>
               
-              <div className="status-table">
-                <div className="status-table-header">
-                  <div className="status-header-item">Status</div>
-                  <div className="status-header-item">Quantidade</div>
+              {isLoading && (
+                <div className="loading-message">
+                  <p>Carregando dados...</p>
                 </div>
-                
-                <div className="status-list">
-                  <div className="status-item">
-                    <div className="status-icon-container">
-                      <div className="icon status-icon">
-                        <span>📊</span>
-                      </div>
-                    </div>
-                    <div className="status-name">Vitória</div>
-                    <div className="status-count">25</div>
+              )}
+
+              {error && (
+                <div className="error-message">
+                  <p>{error}</p>
+                  <button onClick={loadStatusData} className="retry-button">
+                    Tentar novamente
+                  </button>
+                </div>
+              )}
+
+              {!isLoading && !error && (
+                <div className="status-table">
+                  <div className="status-table-header">
+                    <div className="status-header-item">Status</div>
+                    <div className="status-header-item">Quantidade</div>
                   </div>
                   
-                  <div className="status-item">
-                    <div className="status-icon-container">
-                      <div className="icon status-icon">
-                        <span>📊</span>
-                      </div>
-                    </div>
-                    <div className="status-name">Abandono</div>
-                    <div className="status-count">25</div>
-                  </div>
-                  
-                  <div className="status-item">
-                    <div className="status-icon-container">
-                      <div className="icon status-icon">
-                        <span>📊</span>
-                      </div>
-                    </div>
-                    <div className="status-name">Desclassificado</div>
-                    <div className="status-count">25</div>
-                  </div>
-                  
-                  <div className="status-item">
-                    <div className="status-icon-container">
-                      <div className="icon status-icon">
-                        <span>📊</span>
-                      </div>
-                    </div>
-                    <div className="status-name">Não Largou</div>
-                    <div className="status-count">25</div>
-                  </div>
-                  
-                  <div className="status-item">
-                    <div className="status-icon-container">
-                      <div className="icon status-icon">
-                        <span>📊</span>
-                      </div>
-                    </div>
-                    <div className="status-name">Não Terminou</div>
-                    <div className="status-count">25</div>
+                  <div className="status-list">
+                    {statusData.length > 0 ? (
+                      statusData.map((item, index) => (
+                        <div key={index} className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">{item.status}</div>
+                          <div className="status-count">{item.total}</div>
+                        </div>
+                      ))
+                    ) : (
+                      // Estado vazio com status zerados
+                      <>
+                        <div className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">Finished</div>
+                          <div className="status-count">0</div>
+                        </div>
+                        
+                        <div className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">Accident</div>
+                          <div className="status-count">0</div>
+                        </div>
+                        
+                        <div className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">Engine</div>
+                          <div className="status-count">0</div>
+                        </div>
+                        
+                        <div className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">Retired</div>
+                          <div className="status-count">0</div>
+                        </div>
+                        
+                        <div className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">Disqualified</div>
+                          <div className="status-count">0</div>
+                        </div>
+                        
+                        <div className="status-item">
+                          <div className="status-icon-container">
+                            <div className="icon status-icon">
+                              <span>📊</span>
+                            </div>
+                          </div>
+                          <div className="status-name">Did not qualify</div>
+                          <div className="status-count">0</div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
           
