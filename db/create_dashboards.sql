@@ -23,7 +23,7 @@ $$ LANGUAGE plpgsql;
 
 -- FUNÇÃO 2: Listagem de corridas do ano de 2024
 -- Retorna as corridas realizadas em 2024 com informações de id, nome, data, total de voltas e tempo total.
-CREATE FUNCTION get_races_2024()
+CREATE FUNCTION get_races()
 RETURNS TABLE (
     race_id INTEGER,
     race_name TEXT,
@@ -32,6 +32,8 @@ RETURNS TABLE (
     total_time BIGINT
 )
 AS $$
+DECLARE
+  current_year INT := EXTRACT(YEAR FROM CURRENT_DATE);
 BEGIN
   RETURN QUERY
   SELECT
@@ -42,7 +44,7 @@ BEGIN
     COALESCE(SUM(res.milliseconds), 0)  -- Soma do tempo total em milissegundos dos resultados
   FROM races r
   LEFT JOIN results res ON r.raceId = res.raceId
-  WHERE r.year = 2024
+  WHERE r.year = current_year
   GROUP BY r.raceId, r.name, r.date;
 END;
 $$ LANGUAGE plpgsql;
@@ -50,13 +52,15 @@ $$ LANGUAGE plpgsql;
 
 -- FUNÇÃO 3: Pontuação das escuderias em 2024
 -- Retorna a lista das escuderias com a soma total dos pontos obtidos nas corridas do ano de 2024, ordenada do maior para o menor total.
-CREATE OR REPLACE FUNCTION get_constructors_2024()
+CREATE OR REPLACE FUNCTION get_constructors()
 RETURNS TABLE (
   constructor_id INTEGER,
   constructor_name TEXT,
   total_pontos DOUBLE PRECISION
 )
 AS $$
+DECLARE
+  current_year INT := EXTRACT(YEAR FROM CURRENT_DATE);
 BEGIN
   RETURN QUERY
   SELECT
@@ -66,7 +70,7 @@ BEGIN
   FROM results res
   JOIN constructors c ON res.constructorId = c.constructorId
   JOIN races r ON res.raceId = r.raceId
-  WHERE r.year = 2024
+  WHERE r.year = current_year
   GROUP BY c.constructorId, c.name
   ORDER BY total_pontos DESC;
 END;
@@ -75,13 +79,15 @@ $$ LANGUAGE plpgsql;
 
 -- FUNÇÃO 4: Pontuação dos pilotos em 2024
 -- Retorna a lista dos pilotos com a soma total dos pontos obtidos nas corridas do ano de 2024, ordenada do maior para o menor total.
-CREATE OR REPLACE FUNCTION get_drivers_2024()
+CREATE OR REPLACE FUNCTION get_drivers()
 RETURNS TABLE (
   driver_id INTEGER,
   driver_name TEXT,
   total_pontos DOUBLE PRECISION
 )
 AS $$
+DECLARE
+  current_year INT := EXTRACT(YEAR FROM CURRENT_DATE);
 BEGIN
   RETURN QUERY
   SELECT
@@ -91,7 +97,7 @@ BEGIN
   FROM results res
   JOIN driver d ON res.driverId = d.driverId
   JOIN races r ON res.raceId = r.raceId
-  WHERE r.year = 2024
+  WHERE r.year = current_year
   GROUP BY d.driverId, d.forename, d.surname
   ORDER BY total_pontos DESC;
 END;
