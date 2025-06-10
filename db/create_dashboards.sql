@@ -3,7 +3,7 @@
 -- =============================================
 
 -- FUNÇÃO 1: Resumo geral para administrador
--- Retorna o total de pilotos (drivers), escuderias (constructors) e temporadas (seasons) cadastradas no banco.
+-- Retorna o total de pilotos (driver), escuderias (constructors) e temporadas (seasons) cadastradas no banco.
 CREATE FUNCTION get_admin_summary()
 RETURNS TABLE (
     total_driver bigint,
