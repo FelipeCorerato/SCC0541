@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Cadastro.css';
-import { createDriver, type Driver } from '../services/drivers';
-import { createConstructor, type Constructor } from '../services/constructors';
+import { createDriver, type DriverOriginal } from '../services/drivers';
+import { createConstructor, type ConstructorOriginal } from '../services/constructors';
 import { showSuccess, showError } from '../utils/toast';
 
 interface RecordsProps {
@@ -53,7 +53,7 @@ const Records: React.FC<RecordsProps> = () => {
 
     try {
       // Mapear os dados do formulário para a interface Driver
-      const driverData: Omit<Driver, 'driverid'> = {
+      const driverData: Omit<DriverOriginal, 'driverid'> = {
         driverref: driverForm.usuario,
         number: parseInt(driverForm.numeroCarro) || 0,
         code: driverForm.codigoPiloto,
@@ -93,7 +93,7 @@ const Records: React.FC<RecordsProps> = () => {
 
     try {
       // Mapear os dados do formulário para a interface Constructor
-      const constructorData: Omit<Constructor, 'constructorid'> = {
+      const constructorData: Omit<ConstructorOriginal, 'constructorid'> = {
         constructorref: teamForm.usuario,
         name: teamForm.nome,
         nationality: teamForm.nacionalidade,

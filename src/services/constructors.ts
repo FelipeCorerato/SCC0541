@@ -1,11 +1,11 @@
 import api from './api';
 
+// Interface baseada na função get_constructors do banco de dados
+// que retorna: constructor_id, constructor_name, total_pontos
 export interface Constructor {
-  constructorid: number;
-  constructorref: string;
-  name: string;
-  nationality: string;
-  url: string;
+  constructor_id: number;
+  constructor_name: string;
+  total_pontos: number;
 }
 
 export interface EscuderiaStatus {
@@ -18,13 +18,38 @@ export interface EscuderiaPilotoVitorias {
   vitorias: number;
 }
 
-export const getConstructors = (): Promise<Constructor[]> =>
-  api
-    .get<Constructor[]>(`/constructors`)
-    .then(res => res.data);
+/**
+ * Chama a função get_constructors do banco de dados
+ * que retorna as escuderias com a soma total dos pontos obtidos nas corridas do ano atual
+ * 
+ * A função SQL retorna uma TABLE com:
+ * - constructor_id: c.constructorId
+ * - constructor_name: c.name
+ * - total_pontos: SUM(res.points)::DOUBLE PRECISION
+ */
+export const getConstructors = async (): Promise<Constructor[]> => {
+  try {
+    // PostgREST permite chamar funções usando rpc/
+    const { data } = await api.post<Constructor[]>('/rpc/get_constructors');
+    
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar escuderias:', error);
+    throw new Error('Erro ao carregar dados das escuderias');
+  }
+};
 
-export const createConstructor = (constructor: Omit<Constructor, 'constructorid'>) =>
-  api.post<Constructor>('/constructors', constructor)
+// Manter a interface original para compatibilidade com outras partes do sistema
+export interface ConstructorOriginal {
+  constructorid: number;
+  constructorref: string;
+  name: string;
+  nationality: string;
+  url: string;
+}
+
+export const createConstructor = (constructor: Omit<ConstructorOriginal, 'constructorid'>) =>
+  api.post<ConstructorOriginal>('/constructors', constructor)
       .then(res => res.data);
 
 export const getEscuderiaResultadosPorStatus = async (constructorId: number): Promise<EscuderiaStatus[]> => {

@@ -93,25 +93,41 @@ const Summary: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Nome</th>
-                    <th>Round</th>
                     <th>Data</th>
-                    <th>Horário</th>
+                    <th>Total de Voltas</th>
+                    <th>Tempo Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {races.map((race) => (
-                    <tr key={race.raceid}>
+                    <tr key={race.race_id}>
                       <td>
                         <div className="race-info">
                           <div className="icon race-icon">
                             <span>🏎️</span>
                           </div>
-                          <span>{race.name}</span>
+                          <span>{race.race_name}</span>
                         </div>
                       </td>
-                      <td>{race.round}</td>
-                      <td>{new Date(race.date).toLocaleDateString('pt-BR')}</td>
-                      <td>{race.time || 'N/A'}</td>
+                      <td>{new Date(race.race_date).toLocaleDateString('pt-BR')}</td>
+                      <td>{race.total_laps}</td>
+                      <td>
+                        {race.total_time > 0 
+                          ? (() => {
+                              const totalSeconds = Math.floor(race.total_time / 1000);
+                              const hours = Math.floor(totalSeconds / 3600);
+                              const minutes = Math.floor((totalSeconds % 3600) / 60);
+                              const seconds = totalSeconds % 60;
+                              
+                              if (hours > 0) {
+                                return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                              } else {
+                                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                              }
+                            })()
+                          : 'N/A'
+                        }
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -119,7 +135,7 @@ const Summary: React.FC = () => {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">🏁</div>
-                <p>Nenhuma corrida encontrada para 2025</p>
+                <p>Nenhuma corrida encontrada para {new Date().getFullYear()}</p>
               </div>
             )}
           </div>
@@ -143,21 +159,21 @@ const Summary: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Nome</th>
-                    <th>Nacionalidade</th>
+                    <th>Total de Pontos</th>
                   </tr>
                 </thead>
                 <tbody>
                   {constructors.map((constructor) => (
-                    <tr key={constructor.constructorid}>
+                    <tr key={constructor.constructor_id}>
                       <td>
                         <div className="team-info">
                           <div className="icon team-icon">
                             <span>🏁</span>
                           </div>
-                          <span>{constructor.name}</span>
+                          <span>{constructor.constructor_name}</span>
                         </div>
                       </td>
-                      <td>{constructor.nationality}</td>
+                      <td>{constructor.total_pontos.toFixed(1)} pts</td>
                     </tr>
                   ))}
                 </tbody>
@@ -165,7 +181,7 @@ const Summary: React.FC = () => {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">🏎️</div>
-                <p>Nenhuma escudeira encontrada para 2025</p>
+                <p>Nenhuma escudeira encontrada para {new Date().getFullYear()}</p>
               </div>
             )}
           </div>
@@ -189,21 +205,21 @@ const Summary: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Nome</th>
-                    <th>Nacionalidade</th>
+                    <th>Total de Pontos</th>
                   </tr>
                 </thead>
                 <tbody>
                   {drivers.map((driver) => (
-                    <tr key={driver.driverid}>
+                    <tr key={driver.driver_id}>
                       <td>
                         <div className="driver-info">
                           <div className="icon driver-icon">
                             <span>👨‍🏁</span>
                           </div>
-                          <span>{driver.forename} {driver.surname}</span>
+                          <span>{driver.driver_name}</span>
                         </div>
                       </td>
-                      <td>{driver.nationality}</td>
+                      <td>{driver.total_pontos.toFixed(1)} pts</td>
                     </tr>
                   ))}
                 </tbody>
@@ -211,7 +227,7 @@ const Summary: React.FC = () => {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">👨‍🏁</div>
-                <p>Nenhum piloto encontrado para 2025</p>
+                <p>Nenhum piloto encontrado para {new Date().getFullYear()}</p>
               </div>
             )}
           </div>

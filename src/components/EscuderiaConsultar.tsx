@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { searchDriversByName, type Driver } from '../services/drivers';
+import { searchDriversByName, type DriverOriginal } from '../services/drivers';
 import '../styles/EscuderiaConsultar.css';
 
 const EscuderiaConsultar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [pilotos, setPilotos] = useState<Driver[]>([]);
+  const [pilotos, setPilotos] = useState<DriverOriginal[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
