@@ -145,17 +145,15 @@ CREATE TABLE Users_Log (
 CREATE INDEX idx_users_log ON Users_Log(Data);
 
 CREATE OR REPLACE FUNCTION fn_create_users_log(
-    u_id INTEGER,
-    u_data DATE,
-    u_hora TIME
+    u_id INTEGER
 )
 RETURNS VOID AS $$
 BEGIN
     INSERT INTO Users_Log (userid, data, hora)
     VALUES (
         u_id,
-        u_data,
-        u_hora
+        CURRENT_DATE,
+        CURRENT_TIME
     );
 END;
 $$ LANGUAGE plpgsql;
