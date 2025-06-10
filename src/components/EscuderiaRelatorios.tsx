@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getEscuderiaResultadosPorStatus, type EscuderiaStatus } from '../services/constructors';
+import { getEscuderiaResultadosPorStatus, getEscuderiaPilotosVitorias, type EscuderiaStatus, type EscuderiaPilotoVitorias } from '../services/constructors';
 import type { User } from '../services/auth';
 import '../styles/Relatorios.css';
 
@@ -11,6 +11,7 @@ const EscuderiaRelatorios: React.FC<EscuderiaRelatoriosProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState<'status' | 'victories'>('status');
   const [activeView, setActiveView] = useState<'status' | 'victories'>('status');
   const [statusData, setStatusData] = useState<EscuderiaStatus[]>([]);
+  const [victoryData, setVictoryData] = useState<EscuderiaPilotoVitorias[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +25,8 @@ const EscuderiaRelatorios: React.FC<EscuderiaRelatoriosProps> = ({ user }) => {
   useEffect(() => {
     if (activeView === 'status') {
       loadStatusData();
+    } else if (activeView === 'victories') {
+      loadVictoryData();
     }
   }, [activeView, user]);
 
@@ -37,12 +40,31 @@ const EscuderiaRelatorios: React.FC<EscuderiaRelatoriosProps> = ({ user }) => {
     setError(null);
     
     try {
-      console.log({ user })
       const data = await getEscuderiaResultadosPorStatus(user.idoriginal);
       setStatusData(data);
     } catch (err) {
       setError('Erro ao carregar dados de status da escuderia');
       console.error('Erro ao carregar status:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadVictoryData = async () => {
+    if (!user || !user.idoriginal) {
+      setError('Usuário não identificado ou ID da escuderia não encontrado');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const data = await getEscuderiaPilotosVitorias(user.idoriginal);
+      setVictoryData(data);
+    } catch (err) {
+      setError('Erro ao carregar dados de vitórias dos pilotos');
+      console.error('Erro ao carregar vitórias:', err);
     } finally {
       setIsLoading(false);
     }
@@ -197,43 +219,44 @@ const EscuderiaRelatorios: React.FC<EscuderiaRelatoriosProps> = ({ user }) => {
                 Relatório dos pilotos da escuderia e suas vitórias em corridas.
               </p>
               
-              <div className="victories-list">
-                <div className="victory-item">
-                  <div className="victory-icon-container">
-                    <div className="icon race-icon">
-                      <span>🏆</span>
-                    </div>
-                  </div>
-                  <div className="victory-info">
-                    <div className="pilot-name">Lewis Hamilton</div>
-                    <div className="victory-count">15 vitórias</div>
-                  </div>
+              {isLoading && (
+                <div className="loading-message">
+                  <p>Carregando dados...</p>
                 </div>
-                
-                <div className="victory-item">
-                  <div className="victory-icon-container">
-                    <div className="icon race-icon">
-                      <span>🏆</span>
-                    </div>
-                  </div>
-                  <div className="victory-info">
-                    <div className="pilot-name">George Russell</div>
-                    <div className="victory-count">8 vitórias</div>
-                  </div>
+              )}
+
+              {error && (
+                <div className="error-message">
+                  <p>{error}</p>
+                  <button onClick={loadVictoryData} className="retry-button">
+                    Tentar novamente
+                  </button>
                 </div>
-                
-                <div className="victory-item">
-                  <div className="victory-icon-container">
-                    <div className="icon race-icon">
-                      <span>🏆</span>
+              )}
+
+              {!isLoading && !error && (
+                <div className="victories-list">
+                  {victoryData.length > 0 ? (
+                    victoryData.map((item, index) => (
+                      <div key={index} className="victory-item">
+                        <div className="victory-icon-container">
+                          <div className="icon race-icon">
+                            <span>🏆</span>
+                          </div>
+                        </div>
+                        <div className="victory-info">
+                          <div className="pilot-name">{item.piloto}</div>
+                          <div className="victory-count">{item.vitorias} {item.vitorias === 1 ? 'vitória' : 'vitórias'}</div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-data-message">
+                      <p>Nenhuma vitória encontrada para os pilotos desta escuderia.</p>
                     </div>
-                  </div>
-                  <div className="victory-info">
-                    <div className="pilot-name">Valtteri Bottas</div>
-                    <div className="victory-count">12 vitórias</div>
-                  </div>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>

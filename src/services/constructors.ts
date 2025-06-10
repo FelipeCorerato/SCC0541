@@ -13,6 +13,11 @@ export interface EscuderiaStatus {
   total: number;
 }
 
+export interface EscuderiaPilotoVitorias {
+  piloto: string;
+  vitorias: number;
+}
+
 export const getConstructors = (): Promise<Constructor[]> =>
   api
     .get<Constructor[]>(`/constructors`)
@@ -31,5 +36,17 @@ export const getEscuderiaResultadosPorStatus = async (constructorId: number): Pr
   } catch (error) {
     console.error('Erro ao buscar status da escuderia:', error);
     throw new Error('Erro ao carregar dados de status da escuderia');
+  }
+};
+
+export const getEscuderiaPilotosVitorias = async (constructorId: number): Promise<EscuderiaPilotoVitorias[]> => {
+  try {
+    const { data } = await api.post<EscuderiaPilotoVitorias[]>('/rpc/fn_escuderia_pilotos_vitorias', {
+      constr_id: constructorId
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar vitórias dos pilotos da escuderia:', error);
+    throw new Error('Erro ao carregar dados de vitórias dos pilotos');
   }
 };
