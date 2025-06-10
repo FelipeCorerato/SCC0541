@@ -98,7 +98,7 @@ function App() {
           user={user}
         />
         
-        {activeScreen === 'resumo' && <PilotoResumo />}
+        {activeScreen === 'resumo' && <PilotoResumo user={user} />}
         {activeScreen === 'relatorios' && <PilotoRelatorios />}
         
         <PilotoRightSidebar />

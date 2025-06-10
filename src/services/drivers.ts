@@ -8,6 +8,16 @@ export interface Driver {
   total_pontos: number;
 }
 
+// Interface para o resultado da função fn_piloto_estatisticas_ano_circuito
+export interface PilotoEstatisticasAnoCircuito {
+  ano: number;
+  circuito_id: number;
+  circuito_nome: string;
+  total_pontos: number;
+  total_vitorias: number;
+  total_corridas: number;
+}
+
 /**
  * Chama a função get_drivers do banco de dados
  * que retorna os pilotos com a soma total dos pontos obtidos nas corridas do ano atual
@@ -26,6 +36,30 @@ export const getDrivers = async (): Promise<Driver[]> => {
   } catch (error) {
     console.error('Erro ao buscar pilotos:', error);
     throw new Error('Erro ao carregar dados dos pilotos');
+  }
+};
+
+/**
+ * Chama a função fn_piloto_estatisticas_ano_circuito do banco de dados
+ * que retorna estatísticas do piloto por ano e circuito
+ * 
+ * A função SQL retorna uma TABLE com:
+ * - ano: r.year
+ * - circuito_id: r.circuitId
+ * - circuito_nome: c.name
+ * - total_pontos: COALESCE(SUM(res.points)::double precision, 0)
+ * - total_vitorias: COUNT(CASE WHEN res.positionOrder = 1 THEN 1 END)
+ * - total_corridas: COUNT(DISTINCT res.raceId)
+ */
+export const getPilotoEstatisticasAnoCircuito = async (driverId: number): Promise<PilotoEstatisticasAnoCircuito[]> => {
+  try {
+    const { data } = await api.post<PilotoEstatisticasAnoCircuito[]>('/rpc/fn_piloto_estatisticas_ano_circuito', {
+      driver_id: driverId
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar estatísticas do piloto por ano e circuito:', error);
+    throw new Error('Erro ao carregar estatísticas do piloto');
   }
 };
 
