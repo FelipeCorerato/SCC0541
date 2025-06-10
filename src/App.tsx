@@ -190,7 +190,6 @@ function App() {
           <div className="login-header">
             <div className="login-logo">
               <div className="logo-circle">
-                <div className="logo-gradient"></div>
               </div>
               <h2>F1 Data Explorer</h2>
             </div>

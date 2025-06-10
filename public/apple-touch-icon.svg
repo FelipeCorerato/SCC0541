@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="redGradientApple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff1e1e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cc0000;stop-opacity:1" />
+    </linearGradient>
+    
+    <pattern id="checkerboardApple" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="4" height="4" fill="#000000"/>
+      <rect x="4" y="4" width="4" height="4" fill="#000000"/>
+      <rect x="4" y="0" width="4" height="4" fill="#ffffff"/>
+      <rect x="0" y="4" width="4" height="4" fill="#ffffff"/>
+    </pattern>
+    
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f8f8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo com bordas arredondadas -->
+  <rect x="0" y="0" width="180" height="180" rx="40" ry="40" fill="url(#bgGradient)" stroke="#ddd" stroke-width="2"/>
+  
+  <!-- F vermelho -->
+  <path d="M 30 45 L 30 135 L 50 135 L 50 100 L 90 100 L 90 80 L 50 80 L 50 65 L 110 65 L 110 45 Z" 
+        fill="url(#redGradientApple)" 
+        stroke="#990000" 
+        stroke-width="1"/>
+  
+  <!-- 1 com padrão xadrez -->
+  <path d="M 120 45 L 120 65 L 110 65 L 110 80 L 120 80 L 120 115 L 110 115 L 110 135 L 150 135 L 150 115 L 140 115 L 140 45 Z" 
+        fill="url(#checkerboardApple)" 
+        stroke="#333333" 
+        stroke-width="1"/>
+  
+  <!-- Sombra interna para profundidade -->
+  <rect x="0" y="0" width="180" height="180" rx="40" ry="40" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1" stroke-dasharray="none"/>
+</svg> 
