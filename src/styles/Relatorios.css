@@ -123,16 +123,19 @@
 
 .error-message {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
   padding: 40px 20px;
   color: #dc3545;
-  text-align: center;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  margin: 20px 0;
 }
 
 .error-message p {
   font-size: 16px;
-  margin: 0 0 16px 0;
+  margin: 0;
 }
 
 .retry-button {
@@ -156,13 +159,17 @@
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  color: #666;
-  text-align: center;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin: 20px 0;
 }
 
 .no-data-message p {
   font-size: 16px;
   margin: 0;
+  font-style: italic;
 }
 
 /* Filtros para Piloto */
@@ -741,4 +748,52 @@
   padding: 15px 20px;
   display: flex;
   justify-content: center;
+}
+
+/* Airport item improvements */
+.airport-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: transform 0.2s;
+  gap: 15px;
+}
+
+.airport-item:hover {
+  transform: translateX(5px);
+  background-color: #f0f0f0;
+}
+
+.airport-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.airport-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.airport-city {
+  font-size: 12px;
+  color: #666;
+}
+
+.airport-code {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+}
+
+.airport-distance {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding-right: 10px;
+  white-space: nowrap;
 } 

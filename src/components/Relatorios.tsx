@@ -1,10 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Relatorios.css';
+import { 
+  getAdminResultadosPorStatus, 
+  getAdminTotalCorridas, 
+  getAdminCorridasPorCircuito,
+  getAdminCorridasDetalhadas,
+  getAeroportosProximos,
+  type AdminResultadosPorStatus,
+  type AdminTotalCorridas,
+  type AdminCorridasPorCircuito,
+  type AdminCorridasDetalhadas,
+  type AeroportoProximo
+} from '../services/reports';
 
 const Reports: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'status' | 'airports' | 'races'>('status');
   const [activeView, setActiveView] = useState<'status' | 'airports' | 'races'>('status');
   const [expandedCircuits, setExpandedCircuits] = useState<{[key: string]: boolean}>({});
+
+  // Estados para dados reais
+  const [statusData, setStatusData] = useState<AdminResultadosPorStatus[]>([]);
+  const [totalCorridas, setTotalCorridas] = useState<AdminTotalCorridas>({ total_corridas: 0 });
+  const [corridasPorCircuito, setCorridasPorCircuito] = useState<AdminCorridasPorCircuito[]>([]);
+  const [corridasDetalhadas, setCorridasDetalhadas] = useState<{[circuitId: number]: AdminCorridasDetalhadas[]}>({});
+  const [aeroportos, setAeroportos] = useState<AeroportoProximo[]>([]);
+  const [cidadeBusca, setCidadeBusca] = useState<string>('São Paulo');
+
+  // Estados de loading e erro
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Toggle between views when a tab is clicked
   const handleTabClick = (tab: 'status' | 'airports' | 'races') => {
@@ -13,35 +37,79 @@ const Reports: React.FC = () => {
   };
 
   // Toggle circuit expansion
-  const toggleCircuit = (circuitName: string) => {
+  const toggleCircuit = async (circuitId: number, circuitName: string) => {
+    const key = `${circuitId}`;
     setExpandedCircuits(prev => ({
       ...prev,
-      [circuitName]: !prev[circuitName]
+      [key]: !prev[key]
     }));
+
+    // Se está expandindo e não temos os dados detalhados ainda, buscar
+    if (!expandedCircuits[key] && !corridasDetalhadas[circuitId]) {
+      try {
+        const detalhes = await getAdminCorridasDetalhadas(circuitId);
+        setCorridasDetalhadas(prev => ({
+          ...prev,
+          [circuitId]: detalhes
+        }));
+      } catch (err) {
+        console.error('Erro ao buscar detalhes do circuito:', err);
+      }
+    }
   };
 
-  // Mock data for races
-  const circuitsData = [
-    {
-      name: 'São carlos',
-      races: 10,
-      minLaps: 100,
-      avgLaps: 2,
-      maxLaps: 666,
-      details: [
-        { year: 2018, gp: 'GP do Brasil', laps: 100, totalTime: '2:00:15' },
-        { year: 2018, gp: 'GP do Brasil', laps: 100, totalTime: '2:00:15' }
-      ]
-    },
-    {
-      name: 'Santa amaro',
-      races: 10,
-      minLaps: 100,
-      avgLaps: 2,
-      maxLaps: 666,
-      details: []
+  // Carregar dados quando a view muda
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Carregar total de corridas sempre
+        const totalData = await getAdminTotalCorridas();
+        setTotalCorridas(totalData);
+
+        // Carregar dados específicos da view ativa
+        if (activeView === 'status') {
+          const statusResult = await getAdminResultadosPorStatus();
+          setStatusData(statusResult);
+        } else if (activeView === 'races') {
+          const corridasResult = await getAdminCorridasPorCircuito();
+          setCorridasPorCircuito(corridasResult);
+        } else if (activeView === 'airports') {
+          if (cidadeBusca) {
+            const aeroportosResult = await getAeroportosProximos(cidadeBusca);
+            setAeroportos(aeroportosResult);
+          }
+        }
+      } catch (err) {
+        setError('Erro ao carregar dados do relatório');
+        console.error('Erro ao carregar dados:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [activeView, cidadeBusca]);
+
+  // Função para buscar aeroportos
+  const handleBuscarAeroportos = async () => {
+    if (!cidadeBusca.trim()) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const aeroportosResult = await getAeroportosProximos(cidadeBusca);
+      setAeroportos(aeroportosResult);
+    } catch (err) {
+      setError('Erro ao buscar aeroportos próximos');
+      console.error('Erro ao buscar aeroportos:', err);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   return (
     <div className="reports-content">
@@ -54,7 +122,7 @@ const Reports: React.FC = () => {
             </div>
             <div className="total-info">
               <span className="total-label">Corridas</span>
-              <span className="total-value">100</span>
+              <span className="total-value">{totalCorridas.total_corridas}</span>
             </div>
           </div>
         </div>
@@ -94,8 +162,21 @@ const Reports: React.FC = () => {
             <span>Corridas</span>
           </div>
         </div>
+
+        {/* Loading e Error States */}
+        {isLoading && (
+          <div className="loading-message">
+            <p>Carregando dados...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="error-message">
+            <p>{error}</p>
+          </div>
+        )}
         
-        {activeView === 'status' && (
+        {!isLoading && !error && activeView === 'status' && (
           <div className="status-results">
             <h3>Resultados por status</h3>
             <p className="status-description">
@@ -104,60 +185,28 @@ const Reports: React.FC = () => {
             </p>
             
             <div className="status-list">
-              <div className="status-item">
-                <div className="status-icon-container">
-                  <div className="icon status-icon">
-                    <span>📊</span>
+              {statusData.length > 0 ? (
+                statusData.map((item, index) => (
+                  <div key={index} className="status-item">
+                    <div className="status-icon-container">
+                      <div className="icon status-icon">
+                        <span>📊</span>
+                      </div>
+                    </div>
+                    <div className="status-name">{item.status}</div>
+                    <div className="status-count">{item.total}</div>
                   </div>
+                ))
+              ) : (
+                <div className="no-data-message">
+                  <p>Nenhum resultado encontrado</p>
                 </div>
-                <div className="status-name">Vitória</div>
-                <div className="status-count">15</div>
-              </div>
-              
-              <div className="status-item">
-                <div className="status-icon-container">
-                  <div className="icon status-icon">
-                    <span>📊</span>
-                  </div>
-                </div>
-                <div className="status-name">Abandono</div>
-                <div className="status-count">10</div>
-              </div>
-              
-              <div className="status-item">
-                <div className="status-icon-container">
-                  <div className="icon status-icon">
-                    <span>📊</span>
-                  </div>
-                </div>
-                <div className="status-name">Desclassificação</div>
-                <div className="status-count">4</div>
-              </div>
-              
-              <div className="status-item">
-                <div className="status-icon-container">
-                  <div className="icon status-icon">
-                    <span>📊</span>
-                  </div>
-                </div>
-                <div className="status-name">Não largou</div>
-                <div className="status-count">3</div>
-              </div>
-              
-              <div className="status-item">
-                <div className="status-icon-container">
-                  <div className="icon status-icon">
-                    <span>📊</span>
-                  </div>
-                </div>
-                <div className="status-name">Não terminou</div>
-                <div className="status-count">56</div>
-              </div>
+              )}
             </div>
           </div>
         )}
         
-        {activeView === 'airports' && (
+        {!isLoading && !error && activeView === 'airports' && (
           <div className="airports-results">
             <h3>Aeroportos próximos</h3>
             <p className="airports-description">
@@ -169,46 +218,42 @@ const Reports: React.FC = () => {
                 type="text"
                 placeholder="Nome do local"
                 className="airport-search"
-                defaultValue="São Makonha"
+                value={cidadeBusca}
+                onChange={(e) => setCidadeBusca(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleBuscarAeroportos()}
               />
-              <button className="search-button">Buscar</button>
+              <button className="search-button" onClick={handleBuscarAeroportos}>
+                Buscar
+              </button>
             </div>
             
             <div className="airports-list">
-              <div className="airport-item">
-                <div className="airport-icon-container">
-                  <div className="icon airport-icon">
-                    <span>✈️</span>
+              {aeroportos.length > 0 ? (
+                aeroportos.map((aeroporto, index) => (
+                  <div key={index} className="airport-item">
+                    <div className="airport-icon-container">
+                      <div className="icon airport-icon">
+                        <span>✈️</span>
+                      </div>
+                    </div>
+                    <div className="airport-info">
+                      <div className="airport-name">{aeroporto.nome_aeroporto}</div>
+                      <div className="airport-city">{aeroporto.cidade_aeroporto}</div>
+                      <div className="airport-code">{aeroporto.codigo_iata}</div>
+                    </div>
+                    <div className="airport-distance">{aeroporto.distancia_km.toFixed(1)} km</div>
                   </div>
+                ))
+              ) : (
+                <div className="no-data-message">
+                  <p>Nenhum aeroporto encontrado para "{cidadeBusca}"</p>
                 </div>
-                <div className="airport-name">Aeroporto de Vitória</div>
-                <div className="airport-distance">15 km</div>
-              </div>
-              
-              <div className="airport-item">
-                <div className="airport-icon-container">
-                  <div className="icon airport-icon">
-                    <span>✈️</span>
-                  </div>
-                </div>
-                <div className="airport-name">Aeroporto Bob Marley</div>
-                <div className="airport-distance">15 km</div>
-              </div>
-              
-              <div className="airport-item">
-                <div className="airport-icon-container">
-                  <div className="icon airport-icon">
-                    <span>✈️</span>
-                  </div>
-                </div>
-                <div className="airport-name">Aeroporto Internacional</div>
-                <div className="airport-distance">15 km</div>
-              </div>
+              )}
             </div>
           </div>
         )}
 
-        {activeView === 'races' && (
+        {!isLoading && !error && activeView === 'races' && (
           <div className="races-results">
             <h3>Corridas por circuito</h3>
             <p className="races-description">
@@ -225,72 +270,64 @@ const Reports: React.FC = () => {
                 <div className="header-item"></div>
               </div>
               
-              {circuitsData.map((circuit, index) => (
-                <div key={index} className="circuit-group">
-                  <div className="circuit-row">
-                    <div className="circuit-info">
-                      <div className="circuit-icon">
-                        <span>🏁</span>
-                      </div>
-                      <span className="circuit-name">{circuit.name}</span>
-                    </div>
-                    <div className="circuit-data">{circuit.races}</div>
-                    <div className="circuit-data">{circuit.minLaps}</div>
-                    <div className="circuit-data">{circuit.avgLaps}</div>
-                    <div className="circuit-data">{circuit.maxLaps}</div>
-                    <div className="circuit-toggle">
-                      <button 
-                        className="toggle-button"
-                        onClick={() => toggleCircuit(circuit.name)}
-                      >
-                        {expandedCircuits[circuit.name] ? 'Ver menos' : 'Ver mais'}
-                        <span className={`arrow ${expandedCircuits[circuit.name] ? 'up' : 'down'}`}>
-                          {expandedCircuits[circuit.name] ? '▲' : '▼'}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {(expandedCircuits[circuit.name] || circuit.name === 'São carlos') && circuit.details.length > 0 && (
-                    <div className="circuit-details">
-                      <div className="details-header">
-                        <div className="detail-header-item">Ano</div>
-                        <div className="detail-header-item">GP</div>
-                        <div className="detail-header-item">Voltas</div>
-                        <div className="detail-header-item">Tempo Total</div>
-                      </div>
-                      
-                      {circuit.details.map((detail, detailIndex) => (
-                        <div key={detailIndex} className="detail-row">
-                          <div className="detail-icon">
-                            <div className="race-detail-icon">
-                              <span>🏎️</span>
-                            </div>
-                          </div>
-                          <div className="detail-data">{detail.year}</div>
-                          <div className="detail-data">{detail.gp}</div>
-                          <div className="detail-data">{detail.laps}</div>
-                          <div className="detail-data">{detail.totalTime}</div>
+              {corridasPorCircuito.length > 0 ? (
+                corridasPorCircuito.map((circuit, index) => (
+                  <div key={index} className="circuit-group">
+                    <div className="circuit-row">
+                      <div className="circuit-info">
+                        <div className="circuit-icon">
+                          <span>🏁</span>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {circuit.name === 'Santa amaro' && (
-                    <div className="circuit-details">
-                      <div className="circuit-toggle-expanded">
+                        <span className="circuit-name">{circuit.circuito}</span>
+                      </div>
+                      <div className="circuit-data">{circuit.qtd_corridas}</div>
+                      <div className="circuit-data">{circuit.min_voltas}</div>
+                      <div className="circuit-data">{circuit.media_voltas}</div>
+                      <div className="circuit-data">{circuit.max_voltas}</div>
+                      <div className="circuit-toggle">
                         <button 
-                          className="toggle-button expanded"
-                          onClick={() => toggleCircuit(circuit.name)}
+                          className="toggle-button"
+                          onClick={() => toggleCircuit(circuit.circuitid, circuit.circuito)}
                         >
-                          Ver mais
-                          <span className="arrow down">▼</span>
+                          {expandedCircuits[circuit.circuitid] ? 'Ver menos' : 'Ver mais'}
+                          <span className={`arrow ${expandedCircuits[circuit.circuitid] ? 'up' : 'down'}`}>
+                            {expandedCircuits[circuit.circuitid] ? '▲' : '▼'}
+                          </span>
                         </button>
                       </div>
                     </div>
-                  )}
+                    
+                    {expandedCircuits[circuit.circuitid] && corridasDetalhadas[circuit.circuitid] && (
+                      <div className="circuit-details">
+                        <div className="details-header">
+                          <div className="detail-header-item">Nome da Corrida</div>
+                          <div className="detail-header-item">Data</div>
+                          <div className="detail-header-item">Voltas</div>
+                          <div className="detail-header-item">Horário</div>
+                        </div>
+                        
+                        {corridasDetalhadas[circuit.circuitid].map((detail, detailIndex) => (
+                          <div key={detailIndex} className="detail-row">
+                            <div className="detail-icon">
+                              <div className="race-detail-icon">
+                                <span>🏎️</span>
+                              </div>
+                            </div>
+                            <div className="detail-data">{detail.corrida}</div>
+                            <div className="detail-data">{new Date(detail.date).toLocaleDateString('pt-BR')}</div>
+                            <div className="detail-data">{detail.laps}</div>
+                            <div className="detail-data">{detail.time || 'N/A'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="no-data-message">
+                  <p>Nenhuma corrida encontrada</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
