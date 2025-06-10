@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import wallpaper from './assets/wallpaper.jpg'
 import './App.css'
 import './styles/Dashboard.css'
@@ -28,6 +28,36 @@ function App() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Carrega dados do localStorage na inicialização
+  useEffect(() => {
+    const savedUser = localStorage.getItem('f1_user')
+    const savedIsLoggedIn = localStorage.getItem('f1_isLoggedIn')
+    const savedActiveScreen = localStorage.getItem('f1_activeScreen')
+
+    if (savedUser && savedIsLoggedIn === 'true') {
+      try {
+        const parsedUser = JSON.parse(savedUser)
+        setUser(parsedUser)
+        setIsLoggedIn(true)
+        
+        // Define tela inicial baseada na role ou tela salva
+        if (savedActiveScreen) {
+          setActiveScreen(savedActiveScreen)
+        } else if (parsedUser.tipo === 'Escuderia') {
+          setActiveScreen('consultar')
+        } else {
+          setActiveScreen('resumo')
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do localStorage:', error)
+        // Limpa dados corrompidos
+        localStorage.removeItem('f1_user')
+        localStorage.removeItem('f1_isLoggedIn')
+        localStorage.removeItem('f1_activeScreen')
+      }
+    }
+  }, [])
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -38,11 +68,13 @@ function App() {
       setIsLoggedIn(true)
       
       // Define tela inicial baseada na role
-      if (authenticatedUser.tipo === 'Escuderia') {
-        setActiveScreen('consultar')
-      } else {
-        setActiveScreen('resumo')
-      }
+      const initialScreen = authenticatedUser.tipo === 'Escuderia' ? 'consultar' : 'resumo'
+      setActiveScreen(initialScreen)
+      
+      // Salva no localStorage
+      localStorage.setItem('f1_user', JSON.stringify(authenticatedUser))
+      localStorage.setItem('f1_isLoggedIn', 'true')
+      localStorage.setItem('f1_activeScreen', initialScreen)
       
       showSuccess('Login realizado com sucesso!')
     } catch (err) {
@@ -59,11 +91,19 @@ function App() {
     setUsername('')
     setPassword('')
     setActiveScreen('resumo')
+    
+    // Remove dados do localStorage
+    localStorage.removeItem('f1_user')
+    localStorage.removeItem('f1_isLoggedIn')
+    localStorage.removeItem('f1_activeScreen')
+    
     showInfo('Logout realizado com sucesso!')
   }
 
   const handleNavigate = (screen: string) => {
     setActiveScreen(screen)
+    // Salva a tela ativa no localStorage
+    localStorage.setItem('f1_activeScreen', screen)
   }
 
   // Renderiza experiência específica para Escuderia
