@@ -101,7 +101,7 @@ function App() {
         {activeScreen === 'resumo' && <PilotoResumo user={user} />}
         {activeScreen === 'relatorios' && <PilotoRelatorios />}
         
-        <PilotoRightSidebar />
+        <PilotoRightSidebar user={user} />
         <ToastContainer {...toastContainerConfig} />
       </div>
     )
