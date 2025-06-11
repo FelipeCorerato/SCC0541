@@ -137,23 +137,25 @@ VALUES (
 DROP TABLE IF EXISTS Users_Log CASCADE;
 CREATE TABLE Users_Log (
 	UserId INTEGER,
-  Data DATE NOT NULL,
-	Hora TIME NOT NULL,
-	CONSTRAINT PK_UsersLog PRIMARY KEY (UserId, Data, Hora)
+  DataHora TIMESTAMP,
+  Acao TEXT,
+  CONSTRAINT acao_log_check CHECK(Acao in ('login', 'logout')),
+	CONSTRAINT PK_UsersLog PRIMARY KEY (UserId, DataHora)
 );
 
-CREATE INDEX idx_users_log ON Users_Log(Data);
+CREATE INDEX idx_users_log ON Users_Log(DataHora);
 
 CREATE OR REPLACE FUNCTION fn_create_users_log(
-    u_id INTEGER
+    u_id INTEGER,
+    u_acao TEXT
 )
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO Users_Log (userid, data, hora)
+    INSERT INTO Users_Log (userid, datahora, acao)
     VALUES (
         u_id,
-        CURRENT_DATE,
-        CURRENT_TIME
+        CURRENT_TIMESTAMP,
+        u_acao
     );
 END;
 $$ LANGUAGE plpgsql;
