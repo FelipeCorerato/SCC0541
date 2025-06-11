@@ -1,8 +1,8 @@
 -- =============================================
--- Query - Ação de usuário 
+-- Querys - Ações de usuário 
 -- =============================================
 
--- função 1: e verifica se há algum piloto com esse forename que ja tenha corrido pela Escuderia logada
+-- Função 1: verifica se há algum piloto com o forename que ja tenha corrido pela Escuderia logada
 CREATE OR REPLACE FUNCTION get_drivers_by_forename_and_constructor(
   search_forename TEXT,
   constructor_id_input INTEGER
@@ -31,7 +31,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- função 2: verifica a escuderia atual do piloto dado seu ID
+-- Função 2: Verifica a escuderia atual do piloto recebendo seu ID
 CREATE OR REPLACE FUNCTION get_driver_constructor(p_driver_id INT)
 RETURNS TABLE (
   constructor_id INT,

@@ -21,8 +21,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- FUNÇÃO 2: Listagem de corridas do ano de 2024
--- Retorna as corridas realizadas em 2024 com informações de id, nome, data, total de voltas e tempo total.
+-- FUNÇÃO 2: Listagem de corridas do ano corrente
+-- Retorna as corridas realizadas em 2025 com informações
+-- de id, nome, data, total de voltas e tempo total.
 CREATE FUNCTION get_races()
 RETURNS TABLE (
     race_id INTEGER,
@@ -50,8 +51,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- FUNÇÃO 3: Pontuação das escuderias em 2024
--- Retorna a lista das escuderias com a soma total dos pontos obtidos nas corridas do ano de 2024, ordenada do maior para o menor total.
+-- FUNÇÃO 3: Pontuação das escuderias em 2025
+-- Retorna a lista das escuderias com a soma total dos pontos obtidos nas corridas do ano, ordenada do maior parao menor total.
 CREATE OR REPLACE FUNCTION get_constructors()
 RETURNS TABLE (
   constructor_id INTEGER,
@@ -66,7 +67,7 @@ BEGIN
   SELECT
     c.constructorId,
     c.name,
-    SUM(res.points)::DOUBLE PRECISION   -- Soma dos pontos obtidos pela escuderia nas corridas de 2024
+    SUM(res.points)::DOUBLE PRECISION   -- Soma dos pontos
   FROM results res
   JOIN constructors c ON res.constructorId = c.constructorId
   JOIN races r ON res.raceId = r.raceId
@@ -77,8 +78,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- FUNÇÃO 4: Pontuação dos pilotos em 2024
--- Retorna a lista dos pilotos com a soma total dos pontos obtidos nas corridas do ano de 2024, ordenada do maior para o menor total.
+-- FUNÇÃO 4: Pontuação dos pilotos em 2025
+-- Retorna a lista dos pilotos com a soma total dos pontos obtidos nas corridas do ano de 2025, ordenada do maior para o menor total.
 CREATE OR REPLACE FUNCTION get_drivers()
 RETURNS TABLE (
   driver_id INTEGER,
@@ -93,7 +94,7 @@ BEGIN
   SELECT
     d.driverId,
     d.forename || ' ' || d.surname,      
-    SUM(res.points)::DOUBLE PRECISION        -- Soma dos pontos do piloto nas corridas de 2024
+    SUM(res.points)::DOUBLE PRECISION
   FROM results res
   JOIN driver d ON res.driverId = d.driverId
   JOIN races r ON res.raceId = r.raceId

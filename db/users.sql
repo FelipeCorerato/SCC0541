@@ -1,9 +1,11 @@
 /* 
+    - Cria as funções de encriptação e verificação de senha;
     - Define a tabela USERS com os índices necessários;
-    - Faz o ingest inicial de users (constructors, drivers e admin);
+    - Faz o ingest inicial de users com os dados originais (constructors, drivers e admin);
     - Cria as funções de atualização e inserção automática de novos users;
     - Cria os triggers das funções;
-    - Cria a tabela Users_Logs
+    - Cria a tabela Users_Logs;
+    - Cria a função de login (recebe credenciais, verifica, retorna o resultado)
 */
 
 --=======================================================================================================
@@ -56,6 +58,8 @@ CREATE TABLE USERS (
 -- Índices para melhorar consultas por tipo e por origem
 CREATE INDEX idx_users_tipo ON Users(Tipo);
 CREATE INDEX idx_users_idoriginal ON Users(IdOriginal);
+
+--=======================================================================================================
 
 -- Insere escuderias da tabela Constructors como usuários
 INSERT INTO Users (Login, Password, Tipo, IdOriginal)

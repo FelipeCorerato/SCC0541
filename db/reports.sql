@@ -1,4 +1,14 @@
 -- =============================================
+-- ÍNDICES CRIADOS
+-- =============================================
+
+CREATE INDEX idx_results_race ON Results(raceId);
+CREATE INDEX idx_races_year ON Races(year);
+CREATE INDEX idx_airports_location ON Airports(latdeg, longdeg);
+CREATE INDEX idx_results_driver_points_race ON Results (driverId, points, raceId);
+CREATE INDEX idx_results_constructor_position_driver ON Results (constructorId, positionOrder, driverId);
+
+-- =============================================
 -- RELATÓRIOS PARA ADMINISTRADOR
 -- =============================================
 
@@ -212,13 +222,3 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- SELECT * FROM fn_piloto_resultados_por_status(3);
-
--- =============================================
--- ÍNDICES CRIADOS
--- =============================================
-
-CREATE INDEX idx_results_race ON Results(raceId);
-CREATE INDEX idx_races_year ON Races(year);
-CREATE INDEX idx_airports_location ON Airports(latdeg, longdeg);
-CREATE INDEX idx_results_driver_points_race ON Results (driverId, points, raceId);
-CREATE INDEX idx_results_constructor_position_driver ON Results (constructorId, positionOrder, driverId);
