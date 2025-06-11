@@ -377,7 +377,7 @@ const Reports: React.FC = () => {
                 <div className="header-item">Min. Voltas</div>
                 <div className="header-item">Média Voltas</div>
                 <div className="header-item">Max Voltas</div>
-                <div className="header-item"></div>
+                <div className="header-item">Ações</div>
               </div>
               
               {corridasPorCircuito.length > 0 ? (
@@ -392,11 +392,11 @@ const Reports: React.FC = () => {
                       </div>
                       <div className="circuit-data">{circuit.qtd_corridas}</div>
                       <div className="circuit-data">{circuit.min_voltas}</div>
-                      <div className="circuit-data">{circuit.media_voltas}</div>
+                      <div className="circuit-data">{Math.round(circuit.media_voltas)}</div>
                       <div className="circuit-data">{circuit.max_voltas}</div>
                       <div className="circuit-toggle">
                         <button 
-                          className="toggle-button"
+                          className={`toggle-button ${expandedCircuits[circuit.circuitid] ? 'expanded' : ''}`}
                           onClick={() => toggleCircuit(circuit.circuitid, circuit.circuito)}
                         >
                           {expandedCircuits[circuit.circuitid] ? 'Ver menos' : 'Ver mais'}
@@ -410,6 +410,7 @@ const Reports: React.FC = () => {
                     {expandedCircuits[circuit.circuitid] && corridasDetalhadas[circuit.circuitid] && (
                       <div className="circuit-details">
                         <div className="details-header">
+                          <div className="detail-header-item">Ícone</div>
                           <div className="detail-header-item">Nome da Corrida</div>
                           <div className="detail-header-item">Data</div>
                           <div className="detail-header-item">Voltas</div>

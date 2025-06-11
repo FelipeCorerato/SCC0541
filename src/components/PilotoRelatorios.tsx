@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPilotoPontosPorAno, type PilotoPontosPorAno } from '../services/drivers';
+import { getPilotoPontosPorAno, getPilotoResultadosPorStatus, type PilotoPontosPorAno, type PilotoResultadosPorStatus } from '../services/drivers';
 import type { User } from '../services/auth';
 import '../styles/Relatorios.css';
 
@@ -8,16 +8,22 @@ interface PilotoRelatoriosProps {
 }
 
 const PilotoRelatorios: React.FC<PilotoRelatoriosProps> = ({ user }) => {
+  const [activeTab, setActiveTab] = useState<'pontos' | 'status'>('pontos');
   const [selectedYear, setSelectedYear] = useState('all');
   const [selectedCircuit, setSelectedCircuit] = useState('all');
   const [dadosPontos, setDadosPontos] = useState<PilotoPontosPorAno[]>([]);
+  const [dadosStatus, setDadosStatus] = useState<PilotoResultadosPorStatus[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Carregar dados quando o componente montar
+  // Carregar dados quando o componente montar ou quando a aba mudar
   useEffect(() => {
-    loadDadosPontos();
-  }, [user]);
+    if (activeTab === 'pontos') {
+      loadDadosPontos();
+    } else if (activeTab === 'status') {
+      loadDadosStatus();
+    }
+  }, [activeTab, user]);
 
   const loadDadosPontos = async () => {
     if (!user || !user.idoriginal) {
@@ -34,6 +40,26 @@ const PilotoRelatorios: React.FC<PilotoRelatoriosProps> = ({ user }) => {
     } catch (err) {
       setError('Erro ao carregar dados de pontos do piloto');
       console.error('Erro ao carregar pontos:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadDadosStatus = async () => {
+    if (!user || !user.idoriginal) {
+      setError('Usuário não identificado ou ID do piloto não encontrado');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const data = await getPilotoResultadosPorStatus(user.idoriginal);
+      setDadosStatus(data);
+    } catch (err) {
+      setError('Erro ao carregar dados de status do piloto');
+      console.error('Erro ao carregar status:', err);
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +100,28 @@ const PilotoRelatorios: React.FC<PilotoRelatoriosProps> = ({ user }) => {
       <h1>Relatórios</h1>
       <p className="subtitle">Relatórios detalhados de performance do piloto</p>
 
+      {/* Abas de navegação */}
+      <div className="report-tabs">
+        <div 
+          className={`tab ${activeTab === 'pontos' ? 'active' : ''}`}
+          onClick={() => setActiveTab('pontos')}
+        >
+          <div className="icon" style={{ backgroundColor: '#ff9800' }}>
+            <span>⭐</span>
+          </div>
+          <span>Pontos por Corrida</span>
+        </div>
+        <div 
+          className={`tab ${activeTab === 'status' ? 'active' : ''}`}
+          onClick={() => setActiveTab('status')}
+        >
+          <div className="icon" style={{ backgroundColor: '#5c9fff' }}>
+            <span>📊</span>
+          </div>
+          <span>Resultados por Status</span>
+        </div>
+      </div>
+
       {/* Loading */}
       {isLoading && (
         <div className="loading-message">
@@ -85,14 +133,14 @@ const PilotoRelatorios: React.FC<PilotoRelatoriosProps> = ({ user }) => {
       {error && (
         <div className="error-message">
           <p>{error}</p>
-          <button onClick={loadDadosPontos} className="retry-button">
+          <button onClick={activeTab === 'pontos' ? loadDadosPontos : loadDadosStatus} className="retry-button">
             Tentar novamente
           </button>
         </div>
       )}
 
-      {/* Conteúdo principal - só mostra se não está carregando e não há erro */}
-      {!isLoading && !error && (
+      {/* Conteúdo da aba de pontos */}
+      {!isLoading && !error && activeTab === 'pontos' && (
         <>
           {/* Filtros */}
           <div className="filters-container">
@@ -206,6 +254,113 @@ const PilotoRelatorios: React.FC<PilotoRelatoriosProps> = ({ user }) => {
                 <div className="empty-state">
                   <div className="empty-icon">📊</div>
                   <p>Nenhum resultado encontrado para os filtros selecionados</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Conteúdo da aba de status */}
+      {!isLoading && !error && activeTab === 'status' && (
+        <>
+          <div className="status-results">
+            <h3>Status dos Resultados</h3>
+            <p className="status-description">
+              Mostra quantas vezes cada tipo de resultado final aconteceu nas corridas do piloto.
+            </p>
+          </div>
+
+          {/* Estatísticas Resumidas de Status */}
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon" style={{ backgroundColor: '#4caf50' }}>
+                <span>✅</span>
+              </div>
+              <div className="stat-content">
+                <h3>Corridas Finalizadas</h3>
+                <p>{dadosStatus.find(item => item.status === 'Finished')?.total || 0}</p>
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon" style={{ backgroundColor: '#f44336' }}>
+                <span>💥</span>
+              </div>
+              <div className="stat-content">
+                <h3>Acidentes</h3>
+                <p>{dadosStatus.filter(item => item.status.toLowerCase().includes('accident') || item.status.toLowerCase().includes('collision')).reduce((sum, item) => sum + item.total, 0)}</p>
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon" style={{ backgroundColor: '#ff9800' }}>
+                <span>⚙️</span>
+              </div>
+              <div className="stat-content">
+                <h3>Problemas Mecânicos</h3>
+                <p>{dadosStatus.filter(item => item.status.toLowerCase().includes('engine') || item.status.toLowerCase().includes('gearbox') || item.status.toLowerCase().includes('transmission')).reduce((sum, item) => sum + item.total, 0)}</p>
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon" style={{ backgroundColor: '#9c27b0' }}>
+                <span>📊</span>
+              </div>
+              <div className="stat-content">
+                <h3>Total de Resultados</h3>
+                <p>{dadosStatus.reduce((sum, item) => sum + item.total, 0)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela de Status Detalhada */}
+          <div className="table-section">
+            <h2>Status Detalhados</h2>
+            
+            <div className="table-container">
+              {dadosStatus.length > 0 ? (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Quantidade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dadosStatus.map((item, index) => {
+                      return (
+                        <tr key={index}>
+                          <td>
+                            <div className="status-info">
+                              <div className="icon status-icon">
+                                <span>
+                                  {item.status === 'Finished' ? '🏁' :
+                                   item.status.toLowerCase().includes('accident') ? '💥' :
+                                   item.status.toLowerCase().includes('engine') ? '⚙️' :
+                                   item.status.toLowerCase().includes('retired') ? '🚫' :
+                                   item.status.toLowerCase().includes('disqualified') ? '❌' :
+                                   item.status.toLowerCase().includes('spun') ? '🌪️' :
+                                   '📊'}
+                                </span>
+                              </div>
+                              <span>{item.status}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <span className="status-count-badge">
+                              {item.total}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-icon">📊</div>
+                  <p>Nenhum resultado de status encontrado para este piloto</p>
                 </div>
               )}
             </div>

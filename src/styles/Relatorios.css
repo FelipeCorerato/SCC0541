@@ -464,6 +464,22 @@
   color: #666;
 }
 
+/* Status info styles */
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-count-badge {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
 /* Airport search */
 .search-container {
   display: flex;
@@ -591,107 +607,264 @@
     align-items: flex-start;
     gap: 8px;
   }
+
+  /* Responsividade para tabela de corridas */
+  .races-table-header {
+    grid-template-columns: 2fr 80px 80px 80px 80px 100px;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+
+  .circuit-row {
+    grid-template-columns: 2fr 80px 80px 80px 80px 100px;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .circuit-info {
+    gap: 12px;
+  }
+
+  .circuit-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .circuit-name {
+    font-size: 14px;
+  }
+
+  .circuit-data {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+
+  .toggle-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .circuit-details {
+    margin: 0 16px;
+  }
+
+  .details-header {
+    grid-template-columns: 60px 1fr 80px 80px 80px;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 11px;
+  }
+
+  .detail-row {
+    grid-template-columns: 60px 1fr 80px 80px 80px;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+
+  .race-detail-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .detail-data {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Para telas muito pequenas, simplificar ainda mais */
+  .races-table-header {
+    grid-template-columns: 1fr 60px 60px 100px;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .races-table-header .header-item:nth-child(3),
+  .races-table-header .header-item:nth-child(4) {
+    display: none;
+  }
+
+  .circuit-row {
+    grid-template-columns: 1fr 60px 60px 100px;
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .circuit-row .circuit-data:nth-child(3),
+  .circuit-row .circuit-data:nth-child(4) {
+    display: none;
+  }
+
+  .circuit-name {
+    font-size: 13px;
+  }
+
+  .circuit-data {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+
+  .details-header {
+    grid-template-columns: 50px 1fr 60px 80px;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .details-header .detail-header-item:nth-child(4) {
+    display: none;
+  }
+
+  .detail-row {
+    grid-template-columns: 50px 1fr 60px 80px;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .detail-row .detail-data:nth-child(4) {
+    display: none;
+  }
+
+  .race-detail-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 9px;
+  }
+
+  .detail-data {
+    font-size: 12px;
+  }
 }
 
 /* Races Table Styles */
 .races-table {
   background-color: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .races-table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
-  gap: 20px;
-  padding: 15px 20px;
+  grid-template-columns: 3fr 1fr 1fr 1fr 1fr 140px;
+  gap: 16px;
+  padding: 18px 24px;
   background-color: #e9ecef;
   font-weight: 600;
   font-size: 14px;
   color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .header-item {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.header-item:first-child {
+  justify-content: flex-start;
 }
 
 .circuit-group {
   border-bottom: 1px solid #dee2e6;
+  transition: all 0.2s ease;
 }
 
 .circuit-group:last-child {
   border-bottom: none;
 }
 
+.circuit-group:hover {
+  background-color: #f8f9fa;
+}
+
 .circuit-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: 3fr 1fr 1fr 1fr 1fr 140px;
+  gap: 16px;
+  padding: 20px 24px;
   background-color: white;
   align-items: center;
+  transition: all 0.2s ease;
 }
 
 .circuit-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .circuit-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: #c53030;
+  background: linear-gradient(135deg, #c53030, #e53e3e);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 16px;
+  box-shadow: 0 2px 8px rgba(197, 48, 48, 0.3);
+  flex-shrink: 0;
 }
 
 .circuit-name {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .circuit-data {
-  font-weight: 500;
-  color: #495057;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 15px;
+  text-align: center;
+  padding: 8px 12px;
+  background-color: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
 }
 
 .circuit-toggle {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .toggle-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
-  background: none;
-  border: none;
-  color: #6c757d;
-  font-size: 14px;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .toggle-button:hover {
-  background-color: #f8f9fa;
-  color: #495057;
+  background-color: #e2e8f0;
+  border-color: #cbd5e0;
+  color: #2d3748;
 }
 
 .toggle-button.expanded {
-  color: #007bff;
+  background-color: #e6fffa;
+  border-color: #81e6d9;
+  color: #234e52;
 }
 
 .arrow {
   font-size: 12px;
-  transition: transform 0.2s;
+  transition: transform 0.3s ease;
 }
 
 .arrow.up {
@@ -699,60 +872,90 @@
 }
 
 .circuit-details {
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background: linear-gradient(135deg, #f7fafc, #edf2f7);
+  border-top: 1px solid #e2e8f0;
+  margin: 0 24px;
+  border-radius: 0 0 8px 8px;
 }
 
 .details-header {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr 1fr;
-  gap: 20px;
-  padding: 15px 20px;
-  background-color: #e9ecef;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
   font-weight: 600;
-  font-size: 14px;
-  color: #495057;
+  font-size: 13px;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 8px 8px 0 0;
 }
 
 .detail-header-item {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.detail-header-item:first-child {
+  justify-content: center;
+}
+
+.detail-header-item:nth-child(2) {
+  justify-content: flex-start;
 }
 
 .detail-row {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr 1fr;
-  gap: 20px;
-  padding: 15px 20px;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 16px 20px;
   background-color: white;
   align-items: center;
   border-bottom: 1px solid #f1f3f4;
+  transition: all 0.2s ease;
+}
+
+.detail-row:hover {
+  background-color: #f8f9fa;
 }
 
 .detail-row:last-child {
   border-bottom: none;
+  border-radius: 0 0 8px 8px;
 }
 
 .detail-icon {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .race-detail-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background-color: #c53030;
+  background: linear-gradient(135deg, #c53030, #e53e3e);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 12px;
+  box-shadow: 0 2px 4px rgba(197, 48, 48, 0.3);
 }
 
 .detail-data {
   font-size: 14px;
-  color: #495057;
+  color: #4a5568;
+  font-weight: 500;
+  text-align: center;
+}
+
+.detail-data:first-of-type {
+  text-align: left;
+  font-weight: 600;
+  color: #2d3748;
 }
 
 .circuit-toggle-expanded {

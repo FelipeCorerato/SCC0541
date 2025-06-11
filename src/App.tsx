@@ -67,8 +67,7 @@ function App() {
       setUser(authenticatedUser)
       setIsLoggedIn(true)
       
-      // Registra o log de login
-      await createUserLog(authenticatedUser.userid, 'login')
+      // A função fn_user_login já registra o log de login automaticamente
       
       // Define tela inicial baseada na role
       const initialScreen = authenticatedUser.tipo === 'Escuderia' ? 'consultar' : 'resumo'

@@ -32,7 +32,7 @@ const PilotoSidebar: React.FC<PilotoSidebarProps> = ({ activeScreen, onNavigate,
         <div className="avatar">
           <img src={getUserAvatar()} alt={getUserDisplayName()} />
         </div>
-        <h2>Piloto</h2>
+        <h2>{getUserDisplayName()}</h2>
         {user && (
           <p className="user-type">{user.tipo}</p>
         )}

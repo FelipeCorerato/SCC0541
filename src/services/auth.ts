@@ -25,23 +25,33 @@ export async function createUserLog(userId: number, action: 'login' | 'logout'):
 }
 
 /**
- * Tenta autenticar contra a tabela users.
+ * Tenta autenticar usando a função fn_user_login do PostgreSQL.
+ * Esta função já valida as credenciais, verifica o hash da senha e registra o log de login automaticamente.
  * @param user Login (campo login)
  * @param pass Senha (campo password)
  */
 export async function login(user: string, pass: string): Promise<User> {
-  // Monta o filtro: login=eq.<user>&password=eq.<pass>
-  const qs = new URLSearchParams({
-    login:  `eq.${encodeURIComponent(user)}`,
-    password:`eq.${encodeURIComponent(pass)}`
-  }).toString();
+  try {
+    // Chama a função fn_user_login via PostgREST
+    const { data } = await api.post<User[]>('/rpc/fn_user_login', {
+      p_login: user,
+      p_password: pass
+    });
 
-  // Chama o PostgREST
-  const { data } = await api.get<User[]>(`/users?${qs}`);
+    // Se não retornou dados, significa que as credenciais são inválidas
+    if (!data || data.length === 0) {
+      throw new Error('Login ou senha inválidos');
+    }
 
-  if (!data.length) {
-    throw new Error('Login ou senha inválidos');
+    return data[0];
+  } catch (error) {
+    // Se for erro de rede ou servidor, mantém a mensagem original
+    if (error instanceof Error && error.message !== 'Login ou senha inválidos') {
+      console.error('Erro na autenticação:', error);
+      throw new Error('Erro ao conectar com o servidor');
+    }
+    
+    // Caso contrário, é erro de credenciais inválidas
+    throw error;
   }
-
-  return data[0];
 }
