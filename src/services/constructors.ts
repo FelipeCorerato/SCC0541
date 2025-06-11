@@ -58,6 +58,28 @@ export const createConstructor = (constructor: Omit<ConstructorOriginal, 'constr
   api.post<ConstructorOriginal>('/constructors', constructor)
       .then(res => res.data);
 
+/**
+ * Cria uma nova escuderia usando a função fn_create_constructor do banco de dados
+ * A função recebe: p_name, p_nationality, p_url
+ * e gera automaticamente o constructor_ref baseado no nome
+ */
+export const createConstructorWithFunction = async (
+  name: string,
+  nationality: string,
+  url: string
+): Promise<void> => {
+  try {
+    await api.post('/rpc/fn_create_constructor', {
+      p_name: name,
+      p_nationality: nationality,
+      p_url: url
+    });
+  } catch (error) {
+    console.error('Erro ao criar escuderia:', error);
+    throw new Error('Erro ao cadastrar escuderia');
+  }
+};
+
 export const getEscuderiaResultadosPorStatus = async (constructorId: number): Promise<EscuderiaStatus[]> => {
   try {
     const { data } = await api.post<EscuderiaStatus[]>('/rpc/fn_escuderia_resultados_por_status', {

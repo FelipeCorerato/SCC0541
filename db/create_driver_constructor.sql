@@ -20,7 +20,7 @@ DECLARE
     v_constructor_ref VARCHAR;
 BEGIN
     v_constructor_ref := LOWER(REPLACE(p_name, ' ', '_'));
-    INSERT INTO Constructors (constructor_ref, name, nationality, url)
+    INSERT INTO Constructors (constructorref, name, nationality, url)
     VALUES (
         v_constructor_ref,
         p_name,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Cadastro.css';
 import { createDriver, type DriverOriginal } from '../services/drivers';
-import { createConstructor, type ConstructorOriginal } from '../services/constructors';
+import { createConstructorWithFunction } from '../services/constructors';
 import { showSuccess, showError } from '../utils/toast';
 
 interface RecordsProps {
@@ -27,7 +27,6 @@ const Records: React.FC<RecordsProps> = () => {
   const [teamForm, setTeamForm] = useState({
     nome: '',
     nacionalidade: '',
-    usuario: '',
     sitePessoal: ''
   });
 
@@ -92,15 +91,12 @@ const Records: React.FC<RecordsProps> = () => {
     setIsSubmitting(true);
 
     try {
-      // Mapear os dados do formulário para a interface Constructor
-      const constructorData: Omit<ConstructorOriginal, 'constructorid'> = {
-        constructorref: teamForm.usuario,
-        name: teamForm.nome,
-        nationality: teamForm.nacionalidade,
-        url: teamForm.sitePessoal
-      };
-
-      await createConstructor(constructorData);
+      // Usar a função fn_create_constructor que gera automaticamente o constructor_ref
+      await createConstructorWithFunction(
+        teamForm.nome,
+        teamForm.nacionalidade,
+        teamForm.sitePessoal
+      );
       
       showSuccess('Escuderia cadastrada com sucesso!');
       
@@ -108,7 +104,6 @@ const Records: React.FC<RecordsProps> = () => {
       setTeamForm({
         nome: '',
         nacionalidade: '',
-        usuario: '',
         sitePessoal: ''
       });
     } catch (error) {
@@ -283,19 +278,6 @@ const Records: React.FC<RecordsProps> = () => {
                       type="text" 
                       name="nacionalidade"
                       value={teamForm.nacionalidade}
-                      onChange={handleTeamFormChange}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-row">
-                  <div className="form-group full-width">
-                    <label>Usuário</label>
-                    <input 
-                      type="text" 
-                      name="usuario"
-                      value={teamForm.usuario}
                       onChange={handleTeamFormChange}
                       required
                     />
