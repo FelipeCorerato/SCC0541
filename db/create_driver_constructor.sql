@@ -81,7 +81,7 @@ DECLARE
 BEGIN
     -- Cria tabela temporária para leitura dos dados
     CREATE TEMP TABLE tmp_driver_import (
-        driver_ref TEXT,
+        driverRef TEXT,
         number INTEGER,
         code TEXT,
         forename TEXT,
@@ -110,9 +110,9 @@ BEGIN
                 rec.driver_ref := LOWER(REPLACE(rec.surname, ' ', '_'));
             END IF;
 
-            INSERT INTO driver (driver_ref, number, code, forename, surname, dob, nationality, url)
+            INSERT INTO driver (driverRef, number, code, forename, surname, dob, nationality, url)
             VALUES (
-                rec.driver_ref,
+                rec.driverRef,
                 rec.number,
                 rec.code,
                 rec.forename,
