@@ -50,7 +50,7 @@ BEGIN
     a.type::TEXT
   FROM geocities15k c
   JOIN Airports a ON a.isocountry = 'BR' AND a.type IN ('medium_airport', 'large_airport')
-  WHERE c.name ILIKE cidade_nome
+  WHERE c.name ILIKE '%' ||  cidade_nome || '%'
     AND haversine(c.lat, c.long, a.latdeg, a.longdeg) <= 100;
 END;
 $$ LANGUAGE plpgsql;

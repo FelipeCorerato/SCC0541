@@ -77,10 +77,8 @@ const Reports: React.FC = () => {
           const corridasResult = await getAdminCorridasPorCircuito();
           setCorridasPorCircuito(corridasResult);
         } else if (activeView === 'airports') {
-          if (cidadeBusca) {
-            const aeroportosResult = await getAeroportosProximos(cidadeBusca);
-            setAeroportos(aeroportosResult);
-          }
+          // Limpar dados de aeroportos ao entrar na view
+          setAeroportos([]);
         }
       } catch (err) {
         setError('Erro ao carregar dados do relatório');
@@ -91,7 +89,7 @@ const Reports: React.FC = () => {
     };
 
     loadData();
-  }, [activeView, cidadeBusca]);
+  }, [activeView]);
 
   // Função para buscar aeroportos
   const handleBuscarAeroportos = async () => {
