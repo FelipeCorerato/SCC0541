@@ -147,7 +147,7 @@ function App() {
         />
         
         {activeScreen === 'resumo' && <PilotoResumo user={user} />}
-        {activeScreen === 'relatorios' && <PilotoRelatorios />}
+        {activeScreen === 'relatorios' && <PilotoRelatorios user={user} />}
         
         <PilotoRightSidebar user={user} />
         <ToastContainer {...toastContainerConfig} />

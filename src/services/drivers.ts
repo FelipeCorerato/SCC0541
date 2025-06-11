@@ -24,6 +24,13 @@ export interface PilotoAnosAtividade {
   ultimo_ano: number;
 }
 
+// Interface para o resultado da função fn_piloto_pontos_por_ano
+export interface PilotoPontosPorAno {
+  ano: number;
+  corrida: string;
+  pontos: number;
+}
+
 // Interface para o resultado da função get_drivers_by_forename_and_constructor
 export interface DriverByForenameAndConstructor {
   full_name: string;
@@ -93,6 +100,27 @@ export const getPilotoAnosAtividade = async (driverId: number): Promise<PilotoAn
   } catch (error) {
     console.error('Erro ao buscar anos de atividade do piloto:', error);
     throw new Error('Erro ao carregar anos de atividade do piloto');
+  }
+};
+
+/**
+ * Chama a função fn_piloto_pontos_por_ano do banco de dados
+ * que retorna pontos por ano e corrida do piloto
+ * 
+ * A função SQL retorna uma TABLE com:
+ * - ano: ra.year
+ * - corrida: ra.name
+ * - pontos: re.points
+ */
+export const getPilotoPontosPorAno = async (driverId: number): Promise<PilotoPontosPorAno[]> => {
+  try {
+    const { data } = await api.post<PilotoPontosPorAno[]>('/rpc/fn_piloto_pontos_por_ano', {
+      driver_id: driverId
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar pontos do piloto por ano:', error);
+    throw new Error('Erro ao carregar pontos do piloto por ano');
   }
 };
 
