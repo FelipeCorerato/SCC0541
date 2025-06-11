@@ -73,11 +73,13 @@ $$ LANGUAGE plpgsql;
 
 -- =============================================
 -- função para escuderia cadastrar pilotos via csv
+
 CREATE OR REPLACE FUNCTION fn_create_drivers_from_csv(p_filepath TEXT)
 RETURNS VOID AS $$
 DECLARE
     rec RECORD;
     piloto_existente BOOLEAN;
+    v_driver_ref TEXT;
 BEGIN
     -- Cria tabela temporária para leitura dos dados
     CREATE TEMP TABLE tmp_driver_import (
@@ -105,14 +107,12 @@ BEGIN
         ) INTO piloto_existente;
 
         IF NOT piloto_existente THEN
-            -- Gera driverref caso não tenha vindo no CSV
-            IF rec.driverref IS NULL THEN
-                rec.driverref := LOWER(REPLACE(rec.surname, ' ', '_'));
-            END IF;
-            
+            -- Gera driverref
+            v_driver_ref := LOWER(REPLACE(rec.surname, ' ', '_'));
+
             INSERT INTO driver (driverref, number, code, forename, surname, dob, nationality, url)
             VALUES (
-                rec.driverref,
+                v_driver_ref,
                 rec.number,
                 rec.code,
                 rec.forename,
