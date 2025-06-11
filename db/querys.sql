@@ -20,12 +20,32 @@ BEGIN
     d.dob,
     d.nationality
   FROM driver d
-  WHERE d.forename ILIKE search_forename
+  WHERE d.forename ILIKE '%' || search_forename || '%'
     AND EXISTS (
       SELECT 1
       FROM results res
       WHERE res.driverId = d.driverId
         AND res.constructorId = constructor_id_input
     );
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- função 2: verifica a escuderia atual do piloto dado seu ID
+CREATE OR REPLACE FUNCTION get_driver_constructor(p_driver_id INT)
+RETURNS TABLE (
+  constructor_id INT,
+  constructor_name TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    c.constructorId,
+    c.name
+  FROM results res
+  JOIN constructors c ON res.constructorId = c.constructorId
+  WHERE res.driverId = p_driver_id
+  ORDER BY res.raceId DESC
+  LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
