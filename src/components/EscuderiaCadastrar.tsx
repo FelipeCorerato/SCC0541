@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
 import '../styles/EscuderiaConsultar.css';
+import { uploadDriversCSV } from '../services/drivers';
+import { showSuccess, showError } from '../utils/toast';
 
 const EscuderiaCadastrar: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,6 +17,7 @@ const EscuderiaCadastrar: React.FC = () => {
       setSelectedFile(file);
       setFileName(file.name);
       setUploadSuccess(false);
+      setUploadMessage('');
     }
   };
 
@@ -21,23 +25,34 @@ const EscuderiaCadastrar: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) return;
 
     setIsUploading(true);
+    setUploadMessage('');
     
-    // Simula upload do arquivo
-    setTimeout(() => {
-      setIsUploading(false);
+    try {
+      setUploadMessage('Processando arquivo CSV...');
+      await uploadDriversCSV(selectedFile);
       setUploadSuccess(true);
-      console.log('Arquivo enviado:', selectedFile.name);
-    }, 2000);
+      setUploadMessage(`Arquivo "${selectedFile.name}" processado com sucesso! Pilotos cadastrados.`);
+      showSuccess('Pilotos cadastrados com sucesso!');
+    } catch (error) {
+      console.error('Erro no upload:', error);
+      setUploadSuccess(false);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      setUploadMessage(`Erro ao processar o arquivo: ${errorMessage}`);
+      showError('Erro ao processar arquivo CSV');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const resetForm = () => {
     setSelectedFile(null);
     setFileName('');
     setUploadSuccess(false);
+    setUploadMessage('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -51,8 +66,20 @@ const EscuderiaCadastrar: React.FC = () => {
         <div className="search-section">
           <h2>Cadastrar pilotos por arquivo (1 piloto por linha)</h2>
           <p className="search-description">
-            Faça upload de um arquivo CSV com os dados dos pilotos
+            Faça upload de um arquivo CSV com os dados dos pilotos.
           </p>
+          <div className="csv-instructions">
+            <p><strong>Formato do arquivo:</strong></p>
+            <ul>
+              <li><strong>Colunas obrigatórias:</strong> forename, surname</li>
+              <li><strong>Colunas opcionais:</strong> number, code, dob (formato: YYYY-MM-DD), nationality, url</li>
+            </ul>
+            <p><strong>Exemplo:</strong></p>
+            <code className="csv-example">
+              forename,surname,number,code,dob,nationality,url<br/>
+              Lewis,Hamilton,44,HAM,1985-01-07,British,https://lewishamilton.com
+            </code>
+          </div>
 
           <div className="file-upload-container">
             <input
@@ -79,6 +106,12 @@ const EscuderiaCadastrar: React.FC = () => {
             </button>
           </div>
 
+          {uploadMessage && (
+            <div className={`upload-message ${uploadSuccess ? 'success' : 'error'}`}>
+              <p>{uploadMessage}</p>
+            </div>
+          )}
+
           {uploadSuccess && (
             <div className="upload-success">
               <div className="success-icon">✅</div>
@@ -93,7 +126,7 @@ const EscuderiaCadastrar: React.FC = () => {
             <div className="upload-instructions">
               <div className="instruction-icon">📄</div>
               <p>Selecione um arquivo CSV com os dados dos pilotos</p>
-              <small>Formato aceito: .csv, .txt</small>
+              <small>Formatos aceitos: .csv, .txt</small>
             </div>
           )}
         </div>

@@ -140,3 +140,83 @@ export const createDriverWithFunction = async (
     throw new Error('Erro ao cadastrar piloto');
   }
 };
+
+/**
+ * Processa um arquivo CSV no frontend e cadastra pilotos usando a função fn_create_driver
+ * para cada linha do arquivo
+ */
+export const uploadDriversCSV = async (file: File): Promise<void> => {
+  try {
+    // Lê o conteúdo do arquivo
+    const text = await file.text();
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    
+    if (lines.length === 0) {
+      throw new Error('Arquivo CSV está vazio');
+    }
+
+    // Assume que a primeira linha contém os cabeçalhos
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    
+    // Verifica se as colunas necessárias estão presentes
+    const requiredColumns = ['forename', 'surname'];
+    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+    
+    if (missingColumns.length > 0) {
+      throw new Error(`Colunas obrigatórias ausentes: ${missingColumns.join(', ')}`);
+    }
+
+    // Processa cada linha de dados (pula o cabeçalho)
+    const dataLines = lines.slice(1);
+    let successCount = 0;
+    let errorCount = 0;
+    const errors: string[] = [];
+
+    for (let i = 0; i < dataLines.length; i++) {
+      const line = dataLines[i];
+      const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, '')); // Remove aspas se houver
+      
+      if (values.length !== headers.length) {
+        errors.push(`Linha ${i + 2}: número de colunas incorreto`);
+        errorCount++;
+        continue;
+      }
+
+      // Mapeia os valores para um objeto
+      const rowData: { [key: string]: string } = {};
+      headers.forEach((header, index) => {
+        rowData[header] = values[index] || '';
+      });
+
+      try {
+        // Chama a função fn_create_driver com os dados da linha
+        await createDriverWithFunction(
+          parseInt(rowData.number) || 0,
+          rowData.code || '',
+          rowData.forename,
+          rowData.surname,
+          rowData.dob || '1990-01-01', // Data padrão se não fornecida
+          rowData.nationality || '',
+          rowData.url || ''
+        );
+        successCount++;
+      } catch (error) {
+        errors.push(`Linha ${i + 2}: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+        errorCount++;
+      }
+    }
+
+    if (errorCount > 0) {
+      console.warn('Alguns pilotos não puderam ser cadastrados:', errors);
+    }
+
+    if (successCount === 0) {
+      throw new Error('Nenhum piloto foi cadastrado com sucesso');
+    }
+
+    console.log(`Upload concluído: ${successCount} pilotos cadastrados, ${errorCount} erros`);
+  } catch (error) {
+    console.error('Erro ao processar arquivo CSV:', error);
+    throw new Error(error instanceof Error ? error.message : 'Erro ao processar arquivo CSV de pilotos');
+  }
+};
