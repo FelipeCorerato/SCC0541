@@ -57,7 +57,7 @@ DECLARE
     v_driver_ref VARCHAR;
 BEGIN
     v_driver_ref := LOWER(REPLACE(p_surname, ' ', '_'));
-    INSERT INTO Driver (driver_ref, number, code, forename, surname, dob, nationality, url)
+    INSERT INTO Driver (driverref, number, code, forename, surname, dob, nationality, url)
     VALUES (
         v_driver_ref,
         p_number,
@@ -81,7 +81,7 @@ DECLARE
 BEGIN
     -- Cria tabela temporária para leitura dos dados
     CREATE TEMP TABLE tmp_driver_import (
-        driver_ref TEXT,
+        driverref TEXT,
         number INTEGER,
         code TEXT,
         forename TEXT,
@@ -105,14 +105,14 @@ BEGIN
         ) INTO piloto_existente;
 
         IF NOT piloto_existente THEN
-            -- Gera driver_ref caso não tenha vindo no CSV
-            IF rec.driver_ref IS NULL THEN
-                rec.driver_ref := LOWER(REPLACE(rec.surname, ' ', '_'));
+            -- Gera driverref caso não tenha vindo no CSV
+            IF rec.driverref IS NULL THEN
+                rec.driverref := LOWER(REPLACE(rec.surname, ' ', '_'));
             END IF;
-
-            INSERT INTO driver (driver_ref, number, code, forename, surname, dob, nationality, url)
+            
+            INSERT INTO driver (driverref, number, code, forename, surname, dob, nationality, url)
             VALUES (
-                rec.driver_ref,
+                rec.driverref,
                 rec.number,
                 rec.code,
                 rec.forename,
