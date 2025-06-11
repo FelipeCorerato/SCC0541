@@ -117,4 +117,28 @@ export const getAeroportosProximos = async (cidadeNome: string): Promise<Aeropor
     console.error('Erro ao buscar aeroportos próximos:', error);
     throw new Error('Erro ao carregar aeroportos próximos');
   }
+};
+
+/**
+ * Interface e função para buscar cidades para autocomplete
+ */
+export interface CidadeAutocomplete {
+  nome_cidade: string;
+  pais: string;
+}
+
+export const buscarCidadesAutocomplete = async (busca: string): Promise<CidadeAutocomplete[]> => {
+  try {
+    if (!busca || busca.trim().length < 2) {
+      return []; // Não buscar se o termo for muito curto
+    }
+    
+    const { data } = await api.post<CidadeAutocomplete[]>('/rpc/fn_buscar_cidades_autocomplete', {
+      busca: busca.trim()
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar cidades para autocomplete:', error);
+    return [];
+  }
 }; 

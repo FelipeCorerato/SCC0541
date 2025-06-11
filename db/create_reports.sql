@@ -2,6 +2,9 @@
 -- RELATÓRIOS PARA ADMINISTRADOR
 -- =============================================
 
+-- Habilitar extensão para remover acentos
+CREATE EXTENSION IF NOT EXISTS unaccent;
+
 -- RELATÓRIO 1: Contagem de resultados por status
 CREATE OR REPLACE VIEW vw_admin_resultados_por_status AS
 SELECT 
@@ -50,12 +53,40 @@ BEGIN
     a.type::TEXT
   FROM geocities15k c
   JOIN Airports a ON a.isocountry = 'BR' AND a.type IN ('medium_airport', 'large_airport')
-  WHERE c.name ILIKE '%' ||  cidade_nome || '%'
-    AND haversine(c.lat, c.long, a.latdeg, a.longdeg) <= 100;
+  WHERE (
+    c.name ILIKE '%' || cidade_nome || '%' OR
+    unaccent(c.name) ILIKE '%' || unaccent(cidade_nome) || '%'
+  )
+    AND haversine(c.lat, c.long, a.latdeg, a.longdeg) <= 100
+  ORDER BY distancia_km ASC; -- Ordenar do mais próximo para o mais distante
 END;
 $$ LANGUAGE plpgsql;
 
 -- SELECT * FROM fn_admin_aeroportos_proximos('São Paulo');
+
+-- Função para buscar cidades para autocomplete
+CREATE OR REPLACE FUNCTION fn_buscar_cidades_autocomplete(busca TEXT)
+RETURNS TABLE(
+    nome_cidade TEXT,
+    pais TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT DISTINCT
+    c.name::TEXT,
+    c.country::TEXT
+  FROM geocities15k c
+  WHERE (
+    c.name ILIKE '%' || busca || '%' OR
+    unaccent(c.name) ILIKE '%' || unaccent(busca) || '%'
+  )
+    AND c.country = 'BR' -- Filtrar apenas cidades brasileiras
+  ORDER BY c.name
+  LIMIT 10; -- Limitar a 10 sugestões
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT * FROM fn_buscar_cidades_autocomplete('São');
 
 -- RELATÓRIO 3.1: Total de corridas cadastradas
 CREATE OR REPLACE VIEW vw_admin_total_corridas AS

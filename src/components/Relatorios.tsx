@@ -6,11 +6,13 @@ import {
   getAdminCorridasPorCircuito,
   getAdminCorridasDetalhadas,
   getAeroportosProximos,
+  buscarCidadesAutocomplete,
   type AdminResultadosPorStatus,
   type AdminTotalCorridas,
   type AdminCorridasPorCircuito,
   type AdminCorridasDetalhadas,
-  type AeroportoProximo
+  type AeroportoProximo,
+  type CidadeAutocomplete
 } from '../services/reports';
 
 const Reports: React.FC = () => {
@@ -24,8 +26,13 @@ const Reports: React.FC = () => {
   const [corridasPorCircuito, setCorridasPorCircuito] = useState<AdminCorridasPorCircuito[]>([]);
   const [corridasDetalhadas, setCorridasDetalhadas] = useState<{[circuitId: number]: AdminCorridasDetalhadas[]}>({});
   const [aeroportos, setAeroportos] = useState<AeroportoProximo[]>([]);
-  const [cidadeBusca, setCidadeBusca] = useState<string>('São Paulo');
+  const [cidadeBusca, setCidadeBusca] = useState<string>('');
   const [ultimaCidadeBuscada, setUltimaCidadeBuscada] = useState<string>('');
+
+  // Estados para autocomplete de cidades
+  const [sugestoesCidades, setSugestoesCidades] = useState<CidadeAutocomplete[]>([]);
+  const [mostrarSugestoes, setMostrarSugestoes] = useState<boolean>(false);
+  const [indiceSugestaoSelecionada, setIndiceSugestaoSelecionada] = useState<number>(-1);
 
   // Estados de loading e erro
   const [isLoading, setIsLoading] = useState(false);
@@ -77,9 +84,6 @@ const Reports: React.FC = () => {
         } else if (activeView === 'races') {
           const corridasResult = await getAdminCorridasPorCircuito();
           setCorridasPorCircuito(corridasResult);
-        } else if (activeView === 'airports') {
-          // Limpar dados de aeroportos ao entrar na view
-          setAeroportos([]);
         }
       } catch (err) {
         setError('Erro ao carregar dados do relatório');
@@ -93,22 +97,98 @@ const Reports: React.FC = () => {
   }, [activeView]);
 
   // Função para buscar aeroportos
-  const handleBuscarAeroportos = async () => {
-    if (!cidadeBusca.trim()) return;
+  const handleBuscarAeroportos = async (cidade?: string) => {
+    const cidadeParaBuscar = cidade || cidadeBusca;
+    if (!cidadeParaBuscar.trim()) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const aeroportosResult = await getAeroportosProximos(cidadeBusca);
+      const aeroportosResult = await getAeroportosProximos(cidadeParaBuscar);
       setAeroportos(aeroportosResult);
-      setUltimaCidadeBuscada(cidadeBusca); // Salvar a cidade que foi buscada
+      setUltimaCidadeBuscada(cidadeParaBuscar); // Salvar a cidade que foi buscada
     } catch (err) {
       setError('Erro ao buscar aeroportos próximos');
       console.error('Erro ao buscar aeroportos:', err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Funções para autocomplete
+  const handleInputChange = async (value: string) => {
+    setCidadeBusca(value);
+    setIndiceSugestaoSelecionada(-1);
+
+    if (value.trim().length >= 2) {
+      try {
+        const sugestoes = await buscarCidadesAutocomplete(value);
+        setSugestoesCidades(sugestoes);
+        setMostrarSugestoes(true);
+      } catch (error) {
+        console.error('Erro ao buscar sugestões:', error);
+        setSugestoesCidades([]);
+        setMostrarSugestoes(false);
+      }
+    } else {
+      setSugestoesCidades([]);
+      setMostrarSugestoes(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!mostrarSugestoes) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setIndiceSugestaoSelecionada(prev => 
+          prev < sugestoesCidades.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setIndiceSugestaoSelecionada(prev => prev > 0 ? prev - 1 : -1);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (indiceSugestaoSelecionada >= 0) {
+          const cidadeSelecionada = sugestoesCidades[indiceSugestaoSelecionada];
+          setCidadeBusca(cidadeSelecionada.nome_cidade);
+          setMostrarSugestoes(false);
+          setIndiceSugestaoSelecionada(-1);
+          
+          // Executar busca automaticamente com a cidade selecionada
+          handleBuscarAeroportos(cidadeSelecionada.nome_cidade);
+        } else if (cidadeBusca.trim()) {
+          // Se não há sugestão selecionada mas há texto, buscar diretamente
+          setMostrarSugestoes(false);
+          handleBuscarAeroportos();
+        }
+        break;
+      case 'Escape':
+        setMostrarSugestoes(false);
+        setIndiceSugestaoSelecionada(-1);
+        break;
+    }
+  };
+
+  const handleSelectSuggestion = (cidade: CidadeAutocomplete) => {
+    setCidadeBusca(cidade.nome_cidade);
+    setMostrarSugestoes(false);
+    setIndiceSugestaoSelecionada(-1);
+    
+    // Executar busca automaticamente com a cidade selecionada
+    handleBuscarAeroportos(cidade.nome_cidade);
+  };
+
+  const handleInputBlur = () => {
+    // Pequeno delay para permitir clique nas sugestões
+    setTimeout(() => {
+      setMostrarSugestoes(false);
+      setIndiceSugestaoSelecionada(-1);
+    }, 150);
   };
 
   return (
@@ -216,15 +296,29 @@ const Reports: React.FC = () => {
             <div className="search-container">
               <input 
                 type="text"
-                placeholder="Nome do local"
+                placeholder="Digite o nome da cidade para buscar aeroportos próximos..."
                 className="airport-search"
                 value={cidadeBusca}
-                onChange={(e) => setCidadeBusca(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleBuscarAeroportos()}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleInputBlur}
               />
-              <button className="search-button" onClick={handleBuscarAeroportos}>
-                Buscar
-              </button>
+              
+              {/* Container de sugestões */}
+              {mostrarSugestoes && sugestoesCidades.length > 0 && (
+                <div className="suggestions-container">
+                  {sugestoesCidades.map((cidade, index) => (
+                    <div 
+                      key={index}
+                      className={`suggestion-item ${index === indiceSugestaoSelecionada ? 'selected' : ''}`}
+                      onClick={() => handleSelectSuggestion(cidade)}
+                    >
+                      <span className="suggestion-city">{cidade.nome_cidade}</span>
+                      <span className="suggestion-country">{cidade.pais}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className="airports-list">
@@ -236,12 +330,26 @@ const Reports: React.FC = () => {
                         <span>✈️</span>
                       </div>
                     </div>
-                    <div className="airport-info">
-                      <div className="airport-name">{aeroporto.nome_aeroporto}</div>
-                      <div className="airport-city">{aeroporto.cidade_aeroporto}</div>
-                      <div className="airport-code">{aeroporto.codigo_iata}</div>
+                    <div className="airport-content">
+                      <div className="airport-main-info">
+                        <h4 className="airport-name">{aeroporto.nome_aeroporto}</h4>
+                        <span className="airport-type">{aeroporto.tipo === 'large_airport' ? 'Grande Porte' : 'Médio Porte'}</span>
+                      </div>
+                      <div className="airport-details">
+                        <div className="airport-location">
+                          <span className="location-icon">📍</span>
+                          <span className="airport-city">{aeroporto.cidade_aeroporto}</span>
+                        </div>
+                        <div className="airport-code-info">
+                          <span className="code-label">IATA:</span>
+                          <span className="airport-code">{aeroporto.codigo_iata || 'N/A'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="airport-distance">{aeroporto.distancia_km.toFixed(1)} km</div>
+                    <div className="airport-distance-container">
+                      <div className="distance-value">{aeroporto.distancia_km.toFixed(1)}</div>
+                      <div className="distance-unit">km</div>
+                    </div>
                   </div>
                 ))
               ) : (
