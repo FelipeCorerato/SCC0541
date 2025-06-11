@@ -126,12 +126,12 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
   RETURN QUERY
-  SELECT s.status, COUNT(*)
+  SELECT s.status, COUNT(*) as total
   FROM Results r
   JOIN Status s ON s.statusid = r.statusid
   WHERE constructorId = constr_id
   GROUP BY s.status
-  ORDER BY total;
+  ORDER BY total desc;
 END;
 $$ LANGUAGE plpgsql;
 
