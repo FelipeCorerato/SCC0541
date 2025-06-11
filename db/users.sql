@@ -226,8 +226,8 @@ DECLARE
 BEGIN
     -- Busca o usuário pelo login
     SELECT * INTO user_record
-    FROM Users
-    WHERE Login = p_login;
+    FROM Users u
+    WHERE u.Login = p_login;
 
     -- Se o login não for encontrado, retorna vazio
     IF NOT FOUND THEN
