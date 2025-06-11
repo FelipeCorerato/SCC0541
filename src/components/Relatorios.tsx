@@ -25,6 +25,7 @@ const Reports: React.FC = () => {
   const [corridasDetalhadas, setCorridasDetalhadas] = useState<{[circuitId: number]: AdminCorridasDetalhadas[]}>({});
   const [aeroportos, setAeroportos] = useState<AeroportoProximo[]>([]);
   const [cidadeBusca, setCidadeBusca] = useState<string>('São Paulo');
+  const [ultimaCidadeBuscada, setUltimaCidadeBuscada] = useState<string>('');
 
   // Estados de loading e erro
   const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +102,7 @@ const Reports: React.FC = () => {
     try {
       const aeroportosResult = await getAeroportosProximos(cidadeBusca);
       setAeroportos(aeroportosResult);
+      setUltimaCidadeBuscada(cidadeBusca); // Salvar a cidade que foi buscada
     } catch (err) {
       setError('Erro ao buscar aeroportos próximos');
       console.error('Erro ao buscar aeroportos:', err);
@@ -243,9 +245,11 @@ const Reports: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="no-data-message">
-                  <p>Nenhum aeroporto encontrado para "{cidadeBusca}"</p>
-                </div>
+                ultimaCidadeBuscada && (
+                  <div className="no-data-message">
+                    <p>Nenhum aeroporto encontrado para "{ultimaCidadeBuscada}"</p>
+                  </div>
+                )
               )}
             </div>
           </div>
