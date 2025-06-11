@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/Cadastro.css';
-import { createDriver, type DriverOriginal } from '../services/drivers';
+import { createDriverWithFunction, type DriverOriginal } from '../services/drivers';
 import { createConstructorWithFunction } from '../services/constructors';
 import { showSuccess, showError } from '../utils/toast';
 
@@ -19,7 +19,6 @@ const Records: React.FC<RecordsProps> = () => {
     numeroCarro: '',
     nacionalidade: '',
     dataNascimento: '',
-    usuario: '',
     codigoPiloto: '',
     sitePessoal: ''
   });
@@ -51,19 +50,16 @@ const Records: React.FC<RecordsProps> = () => {
     setIsSubmitting(true);
 
     try {
-      // Mapear os dados do formulário para a interface Driver
-      const driverData: Omit<DriverOriginal, 'driverid'> = {
-        driverref: driverForm.usuario,
-        number: parseInt(driverForm.numeroCarro) || 0,
-        code: driverForm.codigoPiloto,
-        forename: driverForm.nome,
-        surname: driverForm.sobrenome,
-        dob: driverForm.dataNascimento,
-        nationality: driverForm.nacionalidade,
-        url: driverForm.sitePessoal
-      };
-
-      await createDriver(driverData);
+      // Usar a função fn_create_driver que gera automaticamente o driver_ref
+      await createDriverWithFunction(
+        parseInt(driverForm.numeroCarro) || 0,
+        driverForm.codigoPiloto,
+        driverForm.nome,
+        driverForm.sobrenome,
+        driverForm.dataNascimento,
+        driverForm.nacionalidade,
+        driverForm.sitePessoal
+      );
       
       showSuccess('Piloto cadastrado com sucesso!');
       
@@ -74,7 +70,6 @@ const Records: React.FC<RecordsProps> = () => {
         numeroCarro: '',
         nacionalidade: '',
         dataNascimento: '',
-        usuario: '',
         codigoPiloto: '',
         sitePessoal: ''
       });
@@ -209,17 +204,6 @@ const Records: React.FC<RecordsProps> = () => {
                 </div>
                 
                 <div className="form-row">
-                  <div className="form-group">
-                    <label>Usuário</label>
-                    <input 
-                      type="text" 
-                      name="usuario"
-                      value={driverForm.usuario}
-                      onChange={handleDriverFormChange}
-                      required
-                    />
-                  </div>
-                  
                   <div className="form-group">
                     <label>Código do piloto</label>
                     <input 

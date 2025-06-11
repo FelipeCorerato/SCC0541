@@ -110,3 +110,33 @@ export const searchDriversByName = (name: string): Promise<DriverOriginal[]> =>
 export const createDriver = (driver: Omit<DriverOriginal, 'driverid'>) =>
   api.post<DriverOriginal>('/driver', driver)
       .then(res => res.data);
+
+/**
+ * Cria um novo piloto usando a função fn_create_driver do banco de dados
+ * A função recebe: p_number, p_code, p_forename, p_surname, p_dob, p_nationality, p_url
+ * e gera automaticamente o driver_ref baseado no sobrenome
+ */
+export const createDriverWithFunction = async (
+  number: number,
+  code: string,
+  forename: string,
+  surname: string,
+  dob: string,
+  nationality: string,
+  url: string
+): Promise<void> => {
+  try {
+    await api.post('/rpc/fn_create_driver', {
+      p_number: number,
+      p_code: code,
+      p_forename: forename,
+      p_surname: surname,
+      p_dob: dob,
+      p_nationality: nationality,
+      p_url: url
+    });
+  } catch (error) {
+    console.error('Erro ao criar piloto:', error);
+    throw new Error('Erro ao cadastrar piloto');
+  }
+};
