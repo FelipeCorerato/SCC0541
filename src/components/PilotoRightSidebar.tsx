@@ -45,16 +45,6 @@ const PilotoRightSidebar: React.FC<PilotoRightSidebarProps> = ({ user }) => {
       
       <div className="total-cards">
         <div className="total-card">
-          <div className="icon driver-icon" style={{ backgroundColor: '#9c27b0' }}>
-            <span>🏆</span>
-          </div>
-          <div className="total-content">
-            <h3>Escuderia</h3>
-            <p>Jamaica</p>
-          </div>
-        </div>
-        
-        <div className="total-card">
           <div className="icon team-icon" style={{ backgroundColor: '#ff9800' }}>
             <span>🏁</span>
           </div>
