@@ -16,7 +16,7 @@ import EscuderiaConsultar from './components/EscuderiaConsultar'
 import EscuderiaCadastrar from './components/EscuderiaCadastrar'
 import PilotoResumo from './components/PilotoResumo'
 import PilotoRelatorios from './components/PilotoRelatorios'
-import { login, type User } from './services/auth'
+import { login, createUserLog, type User } from './services/auth'
 import { ToastContainer } from 'react-toastify'
 import { showSuccess, showError, showInfo, toastContainerConfig } from './utils/toast'
 
@@ -67,6 +67,9 @@ function App() {
       setUser(authenticatedUser)
       setIsLoggedIn(true)
       
+      // Registra o log de login
+      await createUserLog(authenticatedUser.userid, 'login')
+      
       // Define tela inicial baseada na role
       const initialScreen = authenticatedUser.tipo === 'Escuderia' ? 'consultar' : 'resumo'
       setActiveScreen(initialScreen)
@@ -85,7 +88,12 @@ function App() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Registra o log de logout antes de limpar os dados
+    if (user) {
+      await createUserLog(user.userid, 'logout');
+    }
+    
     setIsLoggedIn(false)
     setUser(null)
     setUsername('')
