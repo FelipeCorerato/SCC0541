@@ -464,6 +464,22 @@
   color: #666;
 }
 
+/* Status info styles */
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-count-badge {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
 /* Airport search */
 .search-container {
   display: flex;

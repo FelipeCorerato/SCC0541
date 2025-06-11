@@ -31,6 +31,12 @@ export interface PilotoPontosPorAno {
   pontos: number;
 }
 
+// Interface para o resultado da função fn_piloto_resultados_por_status
+export interface PilotoResultadosPorStatus {
+  status: string;
+  total: number;
+}
+
 // Interface para o resultado da função get_drivers_by_forename_and_constructor
 export interface DriverByForenameAndConstructor {
   full_name: string;
@@ -121,6 +127,26 @@ export const getPilotoPontosPorAno = async (driverId: number): Promise<PilotoPon
   } catch (error) {
     console.error('Erro ao buscar pontos do piloto por ano:', error);
     throw new Error('Erro ao carregar pontos do piloto por ano');
+  }
+};
+
+/**
+ * Chama a função fn_piloto_resultados_por_status do banco de dados
+ * que retorna os resultados do piloto agrupados por status
+ * 
+ * A função SQL retorna uma TABLE com:
+ * - status: s.status
+ * - total: COUNT(*)
+ */
+export const getPilotoResultadosPorStatus = async (driverId: number): Promise<PilotoResultadosPorStatus[]> => {
+  try {
+    const { data } = await api.post<PilotoResultadosPorStatus[]>('/rpc/fn_piloto_resultados_por_status', {
+      driver_id: driverId
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar resultados do piloto por status:', error);
+    throw new Error('Erro ao carregar resultados do piloto por status');
   }
 };
 
