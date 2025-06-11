@@ -109,7 +109,7 @@ BEGIN
             IF rec.driverref IS NULL THEN
                 rec.driverref := LOWER(REPLACE(rec.surname, ' ', '_'));
             END IF;
-
+            
             INSERT INTO driver (driverref, number, code, forename, surname, dob, nationality, url)
             VALUES (
                 rec.driverref,
