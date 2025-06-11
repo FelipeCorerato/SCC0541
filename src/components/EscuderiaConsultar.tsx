@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
-import { searchDriversByName, type DriverOriginal } from '../services/drivers';
+import { getDriversByForenameAndConstructor, type DriverByForenameAndConstructor } from '../services/drivers';
+import type { User } from '../services/auth';
 import '../styles/EscuderiaConsultar.css';
 
-const EscuderiaConsultar: React.FC = () => {
+interface EscuderiaConsultarProps {
+  user?: User | null;
+}
+
+const EscuderiaConsultar: React.FC<EscuderiaConsultarProps> = ({ user }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [pilotos, setPilotos] = useState<DriverOriginal[]>([]);
+  const [pilotos, setPilotos] = useState<DriverByForenameAndConstructor[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async () => {
-    if (!searchTerm.trim()) return;
+    if (!searchTerm.trim() || !user?.idoriginal) return;
     
     setIsLoading(true);
     setHasSearched(true);
     
     try {
-      const results = await searchDriversByName(searchTerm.trim());
+      const results = await getDriversByForenameAndConstructor(searchTerm.trim(), user.idoriginal);
       setPilotos(results);
     } catch (error) {
       console.error('Erro ao buscar pilotos:', error);
@@ -44,7 +49,7 @@ const EscuderiaConsultar: React.FC = () => {
         <div className="search-section">
           <h2>Consultar piloto por nome</h2>
           <p className="search-description">
-            Consulta pilotos da escuderia, exibindo seus dados
+            Consulta pilotos que já correram pela sua escuderia, exibindo seus dados
           </p>
 
           <div className="search-container">
@@ -58,7 +63,7 @@ const EscuderiaConsultar: React.FC = () => {
             />
             <button 
               onClick={handleSearch}
-              disabled={isLoading || !searchTerm.trim()}
+              disabled={isLoading || !searchTerm.trim() || !user?.idoriginal}
               className="search-button"
             >
               {isLoading ? 'Buscando...' : 'Buscar'}
@@ -76,14 +81,14 @@ const EscuderiaConsultar: React.FC = () => {
               <div className="header-cell">Nacionalidade</div>
             </div>
             
-            {pilotos.map((piloto) => (
-              <div key={piloto.driverid} className="table-row">
+            {pilotos.map((piloto, index) => (
+              <div key={index} className="table-row">
                 <div className="table-cell">
                   <div className="pilot-info">
                     <div className="pilot-avatar">
                       <span>👤</span>
                     </div>
-                    <span>{piloto.forename} {piloto.surname}</span>
+                    <span>{piloto.full_name}</span>
                   </div>
                 </div>
                 <div className="table-cell">{formatDate(piloto.dob)}</div>
@@ -98,7 +103,7 @@ const EscuderiaConsultar: React.FC = () => {
         <div className="no-results-container">
           <div className="no-results">
             <div className="empty-icon">🔍</div>
-            <p>Nenhum piloto encontrado com o nome "{searchTerm}"</p>
+            <p>Nenhum piloto encontrado com o nome "{searchTerm}" que tenha corrido pela sua escuderia</p>
           </div>
         </div>
       )}

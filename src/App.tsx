@@ -117,7 +117,7 @@ function App() {
           user={user}
         />
         
-        {activeScreen === 'consultar' && <EscuderiaConsultar />}
+        {activeScreen === 'consultar' && <EscuderiaConsultar user={user} />}
         {activeScreen === 'cadastrar' && <EscuderiaCadastrar />}
         {activeScreen === 'relatorios' && <EscuderiaRelatorios user={user} />}
         

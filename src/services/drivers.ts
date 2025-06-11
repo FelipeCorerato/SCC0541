@@ -24,6 +24,13 @@ export interface PilotoAnosAtividade {
   ultimo_ano: number;
 }
 
+// Interface para o resultado da função get_drivers_by_forename_and_constructor
+export interface DriverByForenameAndConstructor {
+  full_name: string;
+  dob: string; // Será convertido para string no formato ISO
+  nationality: string;
+}
+
 /**
  * Chama a função get_drivers do banco de dados
  * que retorna os pilotos com a soma total dos pontos obtidos nas corridas do ano atual
@@ -218,5 +225,30 @@ export const uploadDriversCSV = async (file: File): Promise<void> => {
   } catch (error) {
     console.error('Erro ao processar arquivo CSV:', error);
     throw new Error(error instanceof Error ? error.message : 'Erro ao processar arquivo CSV de pilotos');
+  }
+};
+
+/**
+ * Chama a função get_drivers_by_forename_and_constructor do banco de dados
+ * que retorna pilotos que já correram pela escuderia e têm o forename pesquisado
+ * 
+ * A função SQL retorna uma TABLE com:
+ * - full_name: d.forename || ' ' || d.surname
+ * - dob: d.dob
+ * - nationality: d.nationality
+ */
+export const getDriversByForenameAndConstructor = async (
+  searchForename: string, 
+  constructorId: number
+): Promise<DriverByForenameAndConstructor[]> => {
+  try {
+    const { data } = await api.post<DriverByForenameAndConstructor[]>('/rpc/get_drivers_by_forename_and_constructor', {
+      search_forename: searchForename,
+      constructor_id_input: constructorId
+    });
+    return data || [];
+  } catch (error) {
+    console.error('Erro ao buscar pilotos por nome e escuderia:', error);
+    throw new Error('Erro ao carregar pilotos da escuderia');
   }
 };
